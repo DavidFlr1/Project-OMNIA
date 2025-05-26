@@ -1,0 +1,8 @@
+public final class PeacefulButHarsh extends JavaPlugin {
+  @Override public void onEnable() {
+    World w = Bukkit.getWorlds().get(0);
+    w.setGameRule(GameRule.NATURAL_REGENERATION, false);  // no auto-heal :contentReference[oaicite:1]{index=1}
+    w.setDifficulty(Difficulty.NORMAL);                  // hunger drains, mobs still disabled
+    w.setGameRule(GameRule.DO_MOB_SPAWNING, true);       // animals OK; monsters already off
+  }
+}

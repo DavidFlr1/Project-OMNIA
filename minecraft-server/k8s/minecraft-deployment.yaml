@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: mc-server }
+  template:
+    metadata:
+      labels: { app: mc-server }
+    spec:
+      containers:
+      - name: server
+        image: <REGION-docker.pkg.dev>/<PROJECT>/minecraft-server:1.21.0
+        env:
+        - { name: MEMORY, value: "4G" }
+        ports:
+        - containerPort: 25565
+        volumeMounts:
+        - { name: world-data, mountPath: /data }
+      volumes:
+      - name: world-data
+        persistentVolumeClaim:
+          claimName: mc-world-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-server-svc
+spec:
+  type: LoadBalancer        # Allows external spectators
+  selector: { app: mc-server }
+  ports:
+  - port: 25565
+    targetPort: 25565
