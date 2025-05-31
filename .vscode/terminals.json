@@ -1,0 +1,61 @@
+{
+  "autorun": true,
+  "terminals": [
+    {
+      "name": "Local",
+      "description": "Terminal to run localhost",
+      "command": "npm run dev",
+      "icon": "vm",
+      "color": "terminal.ansiGreen",
+      "execute": false,
+      "recycle": true,
+      "focus": true
+    },
+    {
+      "name": "Git",
+      "split": "Local",
+      "description": "Terminal to run git",
+      "command": "git pull origin N",
+      "color": "terminal.ansiBlue",
+      "icon": "git-branch",
+      "execute": false,
+      "recycle": true
+    },
+    {
+      "name": "Server",
+      "description": "Terminal to execute the server",
+      "color": "terminal.ansiCyan",
+      "icon": "server-environment",
+      "commands": [
+        "cd minecraft-server",
+        "docker compose down",
+        "docker compose up --build"
+      ],
+      "recycle": true
+    },
+    {
+      "name": "bot-1",
+      "description": "Terminal to execute a bot",
+      "commands": [
+        "cd bot-agent",
+        ""
+      ],
+      "color": "terminal.ansiWhite",
+      "icon": "robot",
+      "execute": false,
+      "recycle": true
+    },
+    {
+      "name": "bot-2",
+      "description": "Terminal to execute a bot",
+      "commands": [
+        "cd bot-agent",
+        ""
+      ],
+      "color": "terminal.ansiWhite",
+      "icon": "robot",
+      "execute": false,
+      "recycle": true
+    }
+  ]
+}

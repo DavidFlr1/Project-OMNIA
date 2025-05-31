@@ -102,7 +102,3 @@ Thumbs.db
 
 # Redis dump
 dump.rdb
-
-
-# ON DEVELOPMENT
-src/
