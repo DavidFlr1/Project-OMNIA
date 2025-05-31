@@ -92,6 +92,9 @@ export class CommandHandler {
         case "help":
           this.showHelp(bot)
           break
+        case "targeting":
+          this.showTargetingHelp(bot)
+          break
 
         default:
           logger.warn(`Unknown command: ${action}`)
@@ -136,6 +139,17 @@ export class CommandHandler {
     bot.chat("Try talking to me while looking at me from nearby.")
   }
 
+  private showTargetingHelp(bot: MineflayerBot): void {
+    const botName = bot.username
+    bot.chat("=== Bot Targeting Help ===")
+    bot.chat(`I'm ${botName}. Here's how to target me specifically:`)
+    bot.chat(`1. Look at me + be nearby: "!goto 100 64 200"`)
+    bot.chat(`2. Use my name: "!${botName} goto 100 64 200"`)
+    bot.chat(`3. Mention me: "@${botName} !goto 100 64 200"`)
+    bot.chat(`4. Include my name: "!goto 100 64 200 ${botName}"`)
+    bot.chat("This prevents other bots from following the same command!")
+  }
+
   private showStatus(bot: MineflayerBot): void {
     const pos = bot.entity.position
     const status = `Status: Health: ${bot.health}/20, Food: ${bot.food}/20, Position: (${Math.floor(pos.x)}, ${Math.floor(pos.y)}, ${Math.floor(pos.z)})`
@@ -166,13 +180,16 @@ export class CommandHandler {
 
   private showHelp(bot: MineflayerBot): void {
     const commands = [
+      "=== Commands ===",
       "Movement: goto <x> <y> <z>, follow <player>, patrol <x1> <z1> <x2> <z2>, stop",
-      "Gathering: mine <block>, collect <item>, harvest <crop>",
+      "Gathering: mine <block_id>, collect <item_id>, harvest <crop_id>",
       "Combat: attack <target>, defend, flee",
       "Exploration: explore <radius>, scout <direction>, map <radius>",
       "Interaction: interact <stats|on|off>, responses",
-      "Utility: status, inventory, help",
-      "Note: I also respond to normal chat when you're nearby and looking at me!",
+      "Utility: status, inventory, help, targeting",
+      "=== Targeting ===",
+      "Type '!targeting' to learn how to control me individually!",
+      "I also respond to normal chat when you're nearby and looking at me!",
     ]
 
     commands.forEach((cmd) => bot.chat(cmd))

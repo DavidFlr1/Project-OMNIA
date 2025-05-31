@@ -1,4 +1,3 @@
-**Terminals manager recommended**: https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals
 <aside>
 👉 **Summary**
 Project OMNIA (Organized Minecraft Neural Intelligent Agents) its a Minecraft Bot Civilization project that looks to fill a world autonomous players capable to perform any in-game mechanic (farm, mine, fight, trade, build, eat, chat, etc) as well as to interact between bots to create significant and persistent connections with the common objective to organize and build an ecosystem.
@@ -83,3 +82,6 @@ Success will be evaluated across **technical**, **behavioral**, and **systemic**
 | **Emergent Chaos** | Civilizations may collapse or behave nonsensically without guidance. | Seed with templates/goals and allow gradual learning; enforce simulation rules as needed. |
 
 ### 🤷🏼‍♂️ Open Questions
+
+### Recommended settings
+- Install vsc extension: https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals

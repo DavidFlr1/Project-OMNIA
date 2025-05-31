@@ -1,5 +1,5 @@
 {
-  "autorun": true,
+  "autorun": false,
   "terminals": [
     {
       "name": "Local",
@@ -27,9 +27,7 @@
       "color": "terminal.ansiCyan",
       "icon": "server-environment",
       "commands": [
-        "cd minecraft-server",
-        "docker compose down",
-        "docker compose up --build"
+        "cd minecraft-server"
       ],
       "recycle": true
     },

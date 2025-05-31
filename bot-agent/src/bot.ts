@@ -100,10 +100,18 @@ export class Bot {
       logger.info(`Chat: <${username}> ${message}`)
       this.memory.addChatMessage(username, message)
 
-      // Process commands from chat (only if they start with !)
+      // Process commands from chat (only if they start with ! and are targeted at this bot)
       if (message.startsWith("!")) {
-        const command = message.slice(1)
-        this.executeCommand(command)
+        // Check if this command is targeted at this specific bot
+        if (this.interactionManager && this.interactionManager.shouldProcessCommand(message, username)) {
+          logger.info(`Processing targeted command from ${username}: ${message}`)
+          const command = this.extractCommand(message)
+          if (command) {
+            this.executeCommand(command)
+          }
+        } else {
+          logger.debug(`Command not targeted at this bot (${this.bot!.username})`)
+        }
       }
       // Note: Interaction manager handles regular chat for conversations
     })
@@ -152,6 +160,27 @@ export class Bot {
     this.bot.on("error", (error) => {
       logger.error("Bot error:", error)
     })
+  }
+
+  private extractCommand(message: string): string | null {
+    const botName = this.bot!.username.toLowerCase()
+
+    // Handle different command formats:
+    // "@BotName !command args" -> "command args"
+    // "!BotName command args" -> "command args"
+    // "!command args" (when targeted via proximity/eye contact) -> "command args"
+
+    let command = message.slice(1) // Remove initial !
+
+    // Remove bot name if it's at the start
+    if (command.toLowerCase().startsWith(botName)) {
+      command = command.slice(botName.length).trim()
+    }
+
+    // Remove @ symbol if present
+    command = command.replace(/^@\w+\s*/, "").trim()
+
+    return command || null
   }
 
   async executeCommand(command: string): Promise<void> {

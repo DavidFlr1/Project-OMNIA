@@ -1,0 +1,70 @@
+package me.blockprotector;
+
+import com.google.gson.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.FileReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class IndestructibleBlocks extends JavaPlugin implements Listener {
+
+    private final Set<Material> protectedMaterials = new HashSet<>();
+    private final Map<UUID, Integer> opLevels = new HashMap<>();
+
+    @Override
+    public void onEnable() {
+        // Build material set (all concrete, glass panes, sea lantern)
+        Arrays.stream(Material.values())
+                .filter(m -> m.name().endsWith("_CONCRETE") || m.name().endsWith("_GLASS_PANE"))
+                .forEach(protectedMaterials::add);
+        protectedMaterials.add(Material.SEA_LANTERN);
+
+        loadOpLevels();
+        Bukkit.getPluginManager().registerEvents(this, this);
+        getLogger().info("IndestructibleBlocks enabled");
+    }
+
+    private void loadOpLevels() {
+        try {
+            File ops = new File(Bukkit.getServer().getWorldContainer(), "ops.json");
+            if (!ops.exists()) return;
+            JsonArray arr = JsonParser.parseReader(new FileReader(ops)).getAsJsonArray();
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+                UUID uuid = UUID.fromString(obj.get("uuid").getAsString());
+                int lvl = obj.get("level").getAsInt();
+                opLevels.put(uuid, lvl);
+            }
+        } catch (Exception e) {
+            getLogger().warning("Could not load ops.json: " + e.getMessage());
+        }
+    }
+
+    private boolean canModify(Player p) {
+        if (p.hasPermission("blockprotector.bypass")) return true;
+        Integer lvl = opLevels.get(p.getUniqueId());
+        return lvl != null && lvl >= 3;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent e) {
+        if (protectedMaterials.contains(e.getBlock().getType()) && !canModify(e.getPlayer())) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage("§cYou cannot break this block.");
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onExplosion(EntityExplodeEvent e) {
+        e.blockList().removeIf(b -> protectedMaterials.contains(b.getType()));
+    }
+}

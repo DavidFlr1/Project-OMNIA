@@ -122,3 +122,6 @@ kubectl apply -f k8s/
 ## Backups
 
 Automated hourly backups are configured in Kubernetes using a CronJob that saves world data to Google Cloud Storage.
+
+### Recommended settings
+- Enable F3 + H in game to get block id's

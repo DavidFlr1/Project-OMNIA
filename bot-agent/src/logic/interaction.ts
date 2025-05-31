@@ -51,7 +51,7 @@ export class InteractionManager {
     })
 
     // Look at nearest player periodically
-    this.bot.on("physicTick", () => {
+    this.bot.on("physicsTick", () => {
       this.handleLookAtPlayer()
     })
   }
@@ -68,10 +68,19 @@ export class InteractionManager {
       `Chat interaction: ${username} - Distance: ${distance.toFixed(2)}, Nearby: ${isNearby}, Looking: ${isLooking}`,
     )
 
-    // Check if player is nearby and looking at the bot
-    if (isNearby && isLooking) {
-      this.respondToPlayer(username, message)
-      this.startLookingAtPlayer(username)
+    // Check if this is a targeted command
+    if (message.startsWith("!")) {
+      const isTargeted = this.isCommandTargetedAtThisBot(message, username, isNearby, isLooking)
+      if (!isTargeted) {
+        logger.debug(`Command not targeted at this bot (${this.bot.username})`)
+        return // Don't process the command
+      }
+    } else {
+      // For regular chat, check if player is nearby and looking at the bot
+      if (isNearby && isLooking) {
+        this.respondToPlayer(username, message)
+        this.startLookingAtPlayer(username)
+      }
     }
 
     // Store interaction in memory
@@ -83,6 +92,67 @@ export class InteractionManager {
       isLooking,
       timestamp: Date.now(),
     })
+  }
+
+  private isCommandTargetedAtThisBot(
+    message: string,
+    username: string,
+    isNearby: boolean,
+    isLooking: boolean,
+  ): boolean {
+    const botName = this.bot.username.toLowerCase()
+    const messageLower = message.toLowerCase()
+
+    // Method 1: Direct name targeting - "@BotName !command" or "!BotName command"
+    if (messageLower.includes(`@${botName}`) || messageLower.startsWith(`!${botName}`)) {
+      logger.debug(`Command directly targeted at ${botName}`)
+      return true
+    }
+
+    // Method 2: Proximity + eye contact targeting (most intuitive)
+    if (isNearby && isLooking) {
+      logger.debug(`Command targeted via proximity and eye contact to ${botName}`)
+      return true
+    }
+
+    // Method 3: Check if message contains bot name anywhere
+    if (messageLower.includes(botName)) {
+      logger.debug(`Command contains bot name ${botName}`)
+      return true
+    }
+
+    // Method 4: If no other bots are nearby, assume it's for this bot
+    const nearbyBots = this.getNearbyBots(username)
+    if (nearbyBots.length === 1 && nearbyBots[0] === botName) {
+      logger.debug(`Only bot nearby, assuming command is for ${botName}`)
+      return true
+    }
+
+    return false
+  }
+
+  private getNearbyBots(playerUsername: string): string[] {
+    const player = this.bot.players[playerUsername]
+    if (!player || !player.entity) return []
+
+    const nearbyBots: string[] = []
+    const playerPos = player.entity.position
+
+    // Check all entities for other bots (players with "bot" in name or specific patterns)
+    Object.values(this.bot.entities).forEach((entity) => {
+      if (entity.type === "player" && entity.username && entity.username !== playerUsername) {
+        const distance = playerPos.distanceTo(entity.position)
+        if (distance <= 8) {
+          // Consider it a bot if it has "bot" in the name or matches bot naming patterns
+          const username = entity.username.toLowerCase()
+          if (username.includes("bot") || username.includes("_bot") || username.startsWith("bot")) {
+            nearbyBots.push(entity.username.toLowerCase())
+          }
+        }
+      }
+    })
+
+    return nearbyBots
   }
 
   private respondToPlayer(username: string, message: string): void {
@@ -195,6 +265,20 @@ export class InteractionManager {
     // Look at the player
     const playerPos = targetPlayer.entity.position.offset(0, targetPlayer.entity.height * 0.9, 0)
     this.bot.lookAt(playerPos)
+  }
+
+  // Public method to check if command should be processed
+  public shouldProcessCommand(message: string, username: string): boolean {
+    if (!message.startsWith("!")) return false
+
+    const player = this.bot.players[username]
+    if (!player || !player.entity) return false
+
+    const distance = this.bot.entity.position.distanceTo(player.entity.position)
+    const isNearby = isPlayerNearby(player.entity, this.bot.entity, 8) // Slightly larger range for commands
+    const isLooking = isLookingAtBot(player.entity, this.bot.entity, 0.7) // More lenient for commands
+
+    return this.isCommandTargetedAtThisBot(message, username, isNearby, isLooking)
   }
 
   // Public methods for external control
