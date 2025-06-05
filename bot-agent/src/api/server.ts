@@ -75,7 +75,7 @@ export async function startApiServer(bot: Bot, port: number): Promise<void> {
       .filter((entity) => entity !== botInstance.entity)
       .map((entity) => ({
         id: entity.id,
-        type: entity.mobType || entity.objectType || "unknown",
+        type: entity.mobType || entity.displayName || "unknown",
         position: entity.position,
         distance: entity.position.distanceTo(botInstance.entity.position),
       }))

@@ -13,7 +13,7 @@ async function startRepl() {
   const bot = new Bot({
     host: process.env.MINECRAFT_HOST || "localhost",
     port: Number.parseInt(process.env.MINECRAFT_PORT || "25565"),
-    username: process.env.MINECRAFT_USERNAME + "-repl",
+    username: process.env.MINECRAFT_USERNAME || "TestBot",
     password: process.env.MINECRAFT_PASSWORD,
   })
 
@@ -255,51 +255,56 @@ async function startRepl() {
 
 function showHelp() {
   console.log(`
-🤖 Available REPL Commands:
+Available REPL Commands:
   
-📡 Connection:
-  connect              - Connect to Minecraft server
-  disconnect           - Disconnect from server  
-  reconnect            - Disconnect and reconnect
-  status               - Show detailed bot status
-  config               - Show current configuration
+- Connection:
+  > status               - Show detailed bot status
+  *> connect              - Connect to Minecraft server
+  *> disconnect           - Disconnect from server  
+  *> reconnect            - Disconnect and reconnect
+  *> config               - Show current configuration
 
-💬 Communication:
-  chat <message>       - Send chat message
-  say <message>        - Send chat message (alias)
+- Communication:
+  *> chat <message>       - Send chat message
+  *> say <message>        - Send chat message (alias)
   
-👥 Information:
-  players              - List online players
-  entities             - List nearby entities
+ Information:
+  *> players              - List online players
+  *> entities             - List nearby entities
   
-🎮 Bot Commands (when connected):
-  Movement:
-    goto <x> <y> <z>   - Move to coordinates
-    follow <player>    - Follow a player
-    patrol <x1> <z1> <x2> <z2> - Patrol between points
-    stop               - Stop movement
+Bot Commands (when connected):
+-  Movement:
+    > goto <x> <y> <z>   - Move to coordinates
+    > follow <player>    - Follow a player
+    > patrol <x1> <z1> <x2> <z2> - Patrol between points
+    > stop               - Stop movement
 
-  Gathering:
-    mine <block>       - Mine specific block type
-    collect <item>     - Collect items
-    harvest <crop>     - Harvest crops
+-  Gathering:
+    > mine <block> <qty> [range] [scout] [tries] - Enhanced mining
+      Examples:
+        mine stone 10                    - Mine 10 stone blocks
+        mine iron_ore 5 64              - Mine 5 iron ore (range 64)
+        mine diamond_ore 3 32 true 5    - Mine 3 diamonds with scouting
+    *> collect <item> [amount]             - Collect items
+    > harvest <crop>                      - Harvest crops
 
-  Combat:
+-  Combat:
     attack <target>    - Attack entity
     defend             - Enter defensive mode
     flee [distance]    - Flee from danger
 
-  Exploration:
+-  Exploration:
     explore [radius]   - Explore area
     scout <direction>  - Scout in direction
     map [radius]       - Map surrounding area
 
-  Interaction:
+-  Interaction:
     targeting          - Show bot targeting help
+    mining             - Show detailed mining help
     interact stats     - Show interaction statistics
     responses          - Show available responses
 
-  Utility:
+-  Utility:
     inventory          - Show inventory
     help               - Show bot command help
 
@@ -311,6 +316,7 @@ function showHelp() {
   - Use 'status' to see detailed information
   - Commands are executed directly (no ! needed in REPL)
   - In-game, use targeting methods to control specific bots
+  - Try 'mining' command for detailed mining examples
 `)
 }
 

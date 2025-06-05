@@ -84,16 +84,21 @@ export class CommandHandler {
 
         // Utility commands
         case "status":
-          this.showStatus(bot)
+          await this.showStatus(bot)
           break
         case "inventory":
-          this.showInventory(bot)
-          break
-        case "help":
-          this.showHelp(bot)
+          await this.showInventory(bot)
           break
         case "targeting":
           this.showTargetingHelp(bot)
+          break
+
+        // Info commands
+        case "help":
+          this.showHelp(bot)
+          break
+        case "mining":
+          this.showMiningHelp(bot)
           break
 
         default:
@@ -139,6 +144,21 @@ export class CommandHandler {
     bot.chat("Try talking to me while looking at me from nearby.")
   }
 
+  private showMiningHelp(bot: MineflayerBot): void {
+    bot.chat("=== Mining Command Help ===")
+    bot.chat("Usage: mine <block_type> <quantity> [range] [scout] [scout_tries]")
+    bot.chat("Examples:")
+    bot.chat("  mine stone 10          - Mine 10 stone (range: 32)")
+    bot.chat("  mine iron_ore 5 64     - Mine 5 iron ore (range: 64)")
+    bot.chat("  mine diamond_ore 3 32 true 5  - Mine 3 diamonds with scouting")
+    bot.chat("Parameters:")
+    bot.chat("  block_type: Block to mine (e.g., stone, iron_ore)")
+    bot.chat("  quantity: Number of blocks to mine")
+    bot.chat("  range: Search radius (default: 32)")
+    bot.chat("  scout: Move to find blocks (true/false, default: false)")
+    bot.chat("  scout_tries: Max scouting attempts (default: 3)")
+  }
+
   private showTargetingHelp(bot: MineflayerBot): void {
     const botName = bot.username
     bot.chat("=== Bot Targeting Help ===")
@@ -150,10 +170,62 @@ export class CommandHandler {
     bot.chat("This prevents other bots from following the same command!")
   }
 
-  private showStatus(bot: MineflayerBot): void {
+  private async showStatus(bot: MineflayerBot): Promise<void> {
+    try {
     const pos = bot.entity.position
-    const status = `Status: Health: ${bot.health}/20, Food: ${bot.food}/20, Position: (${Math.floor(pos.x)}, ${Math.floor(pos.y)}, ${Math.floor(pos.z)})`
-    bot.chat(status)
+      const health = Math.round(bot.health * 10) / 10
+      const food = Math.round(bot.food * 10) / 10
+
+      // Send status in separate messages with delays to prevent spam kick
+      bot.chat("=== 📊 Bot Status ===")
+
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      bot.chat(`Health: ${health}/20, Food: ${food}/20`)
+
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      bot.chat(`Position: (${Math.round(pos.x)}, ${Math.round(pos.y)}, ${Math.round(pos.z)})`)
+
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      const dimension = bot.game.dimension || "unknown"
+      bot.chat(`Dimension: ${dimension}`)
+      const gameMode = bot.game.gameMode || "unknown"
+      bot.chat(`Mode: ${gameMode}`)
+
+      // Show activity status safely
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      try {
+        const activities = []
+
+        if (this.moveCommands.isActive()) {
+          const moveStatus = this.moveCommands.getStatus()
+          if (moveStatus.following && moveStatus.followTarget) {
+            activities.push(`Following ${moveStatus.followTarget}`)
+          }
+          if (moveStatus.patrolling) {
+            activities.push("Patrolling")
+          }
+        }
+
+        if (this.gatherCommands.isActive()) {
+          const gatherStatus = this.gatherCommands.getStatus()
+          if (gatherStatus.mining) activities.push("Mining")
+          if (gatherStatus.collecting) activities.push("Collecting")
+        }
+
+        if (this.exploreCommands.isActive()) {
+          activities.push("Exploring")
+        }
+
+        const activityText = activities.length > 0 ? activities.join(", ") : "Idle"
+        bot.chat(`Activities: ${activityText}`)
+      } catch (activityError) {
+        logger.warn("Error getting activity status:", activityError)
+        bot.chat("Activities: Unknown")
+      }
+    } catch (error) {
+      logger.error("Error showing status:", error)
+      bot.chat("❌ Error retrieving status")
+    }
   }
 
   private showInventory(bot: MineflayerBot): void {
@@ -182,13 +254,14 @@ export class CommandHandler {
     const commands = [
       "=== Commands ===",
       "Movement: goto <x> <y> <z>, follow <player>, patrol <x1> <z1> <x2> <z2>, stop",
-      "Gathering: mine <block_id>, collect <item_id>, harvest <crop_id>",
+      "Gathering: mine <block> <qty> [range] [scout] [tries], collect <item>, harvest <crop>",
       "Combat: attack <target>, defend, flee",
       "Exploration: explore <radius>, scout <direction>, map <radius>",
       "Interaction: interact <stats|on|off>, responses",
-      "Utility: status, inventory, help, targeting",
-      "=== Targeting ===",
-      "Type '!targeting' to learn how to control me individually!",
+      "Utility: status, inventory, help, targeting, mining",
+      "=== Special Help ===",
+      "Type 'mining' for detailed mining command help",
+      "Type 'targeting' to learn how to control me individually!",
       "I also respond to normal chat when you're nearby and looking at me!",
     ]
 
