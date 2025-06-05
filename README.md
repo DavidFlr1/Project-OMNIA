@@ -85,3 +85,39 @@ Success will be evaluated across **technical**, **behavioral**, and **systemic**
 
 ### Recommended settings
 - Install vsc extension: https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals
+
+
+
+
+
+# Minecraft Bot Monorepo
+
+A sophisticated multi-agent Minecraft bot system with AI decision making capabilities.
+
+## Architecture
+
+This monorepo contains three main components:
+
+### 🤖 bot-agent (Node.js/TypeScript)
+- **Purpose**: Lightweight Mineflayer bot connection and command execution
+- **Features**: 
+  - Real-time Minecraft server connection
+  - Command system (movement, gathering, combat, exploration)
+  - REPL interface for testing
+  - REST API for external control
+  - Memory management with Redis support
+
+### 🧠 bot-logic (Python) 
+- **Purpose**: AI decision engine and multi-agent coordination
+- **Features**:
+  - Multi-agent behavior planning
+  - State management
+  - Task coordination
+  - Integration with Redis and Firestore
+
+### 🌉 fastapi-bridge (Python)
+- **Purpose**: LLM and RAG bridge for AI-powered decisions
+- **Features**:
+  - LLM integration
+  - RAG (Retrieval Augmented Generation)
+  - Communication bridge between bots and AI models
