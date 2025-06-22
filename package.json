@@ -1,0 +1,32 @@
+{
+  "name": "minecraft-bot-monorepo",
+  "version": "1.0.0",
+  "author": {
+    "name": "David Ricardo Flores Tena",
+    "email": "davidricardo.flores33@gmail.com"
+  },
+  "title": "Project OMNIA",
+  "description": "Organized Minecraft Neural Intelligent Agents, a Minecraft Bot Civilization project",
+  "private": true,
+  "workspaces": ["bot-agent", "bot-logic", "fastapi-bridge"],
+  "scripts": {
+    "dev:bot-agent": "cd bot-agent && npm run dev",
+    "build:bot-agent": "cd bot-agent && npm run build",
+    "start:bot-agent": "cd bot-agent && npm start",
+    "test:bot-agent": "cd bot-agent && npm test",
+    "dev:bot-logic": "cd bot-logic && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "start:bot-logic": "cd bot-logic && python -m uvicorn main:app --host 0.0.0.0 --port 8000",
+    "dev:fastapi-bridge": "cd fastapi-bridge && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8001",
+    "start:fastapi-bridge": "cd fastapi-bridge && python -m uvicorn app.main:app --host 0.0.0.0 --port 8001",
+    "dev:all": "concurrently \"npm run dev:bot-agent\" \"npm run dev:bot-logic\" \"npm run dev:fastapi-bridge\"",
+    "setup": "npm install && cd bot-agent && npm install && cd ../bot-logic && pip install -r requirements.txt && cd ../fastapi-bridge && pip install -r requirements.txt",
+    "clean": "rm -rf node_modules bot-agent/node_modules bot-agent/dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

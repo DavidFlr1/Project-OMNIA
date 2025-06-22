@@ -1,0 +1,33 @@
+/kill @e[type=minecraft:text_display,distance=..10]
+/kill @e[type=minecraft:text_display,tag=basic_caption]
+
+
+/summon minecraft:text_display ~ ~4 ~ { 
+  text:'{"text":"Basic Mechanics","color":"green","bold":true}', 
+  billboard:"center",
+  see_through: false,
+  background: 0,
+  shadow: false,
+  scale: 5.0f, 
+  tags:["training_caption"]
+}
+
+/summon minecraft:text_display ~ ~3 ~ {
+  text:'{"text":"Training area for basic in-game mechanics","color":"gray","bold":true}', 
+  billboard:"center",
+  see_through: false,
+  background: 0,
+  shadow: false, 
+  scale: 1.0f, 
+  tags:["training_subcaption"] 
+}
+
+/summon minecraft:text_display ~ ~3 ~ {
+  text:'{"text":"Training area for basic in-game mechanics","color":"gray","bold":true}', 
+  billboard:"center",
+  see_through: false,
+  background: 0,
+  shadow: false, 
+  scale: 1.0f, 
+  tags:["training_subcaption"] 
+}

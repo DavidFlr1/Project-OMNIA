@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  minecraft-server:
+    build: ./minecraft-server
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./minecraft-server/world:/data/world
+      - ./minecraft-server/world/ops.json:/data/ops.json
+    networks:
+      - minecraft-network
+
+  bot-logic:
+    build: ./bot-logic
+    ports:
+      - "8000:8000"
+    environment:
+      - FASTAPI_BRIDGE_URL=http://fastapi-bridge:8001
+    depends_on:
+      - fastapi-bridge
+    networks:
+      - minecraft-network
+
+  fastapi-bridge:
+    build: ./fastapi-bridge
+    ports:
+      - "8001:8001"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - minecraft-network
+
+  bot-agent:
+    build: ./bot-agent
+    environment:
+      - MINECRAFT_HOST=minecraft-server
+      - MINECRAFT_PORT=25565
+      - MINECRAFT_USERNAME=MinecraftBot
+      - BOT_LOGIC_URL=http://bot-logic:8000
+      - API_PORT=3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - minecraft-server
+      - bot-logic
+    networks:
+      - minecraft-network
+
+networks:
+  minecraft-network:
+    driver: bridge

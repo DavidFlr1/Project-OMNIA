@@ -1,0 +1,20 @@
+# Placeholder for Kubernetes deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-bridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-bridge
+  template:
+    metadata:
+      labels:
+        app: fastapi-bridge
+    spec:
+      containers:
+      - name: fastapi-bridge
+        image: fastapi-bridge:latest
+        ports:
+        - containerPort: 8001

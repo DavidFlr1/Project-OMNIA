@@ -1,0 +1,249 @@
+{
+  "commands": {
+    "movement": {
+      "goto": {
+        "syntax": "goto <x> <y> <z>",
+        "args": "<x> <y> <z>",
+        "description": "Move to specific coordinates",
+        "example": "goto 100 64 200",
+        "status": true,
+        "intent_keywords": ["go to", "move to", "walk to", "travel to", "goto", "coordinates", "position"]
+      },
+      "follow": {
+        "syntax": "follow <player>",
+        "args": "<player>",
+        "description": "Follow a specific player",
+        "example": "follow Steve",
+        "status": true,
+        "intent_keywords": ["follow", "chase", "track", "accompany", "shadow"]
+      },
+      "patrol": {
+        "syntax": "patrol <x1> <z1> <x2> <z2>",
+        "args": "<x1> <z1> <x2> <z2>",
+        "description": "Patrol between two points",
+        "example": "patrol 0 0 100 100",
+        "status": true,
+        "intent_keywords": ["patrol", "guard", "watch", "monitor", "circuit"]
+      },
+      "stop": {
+        "syntax": "stop",
+        "args": "",
+        "description": "Stop all movement",
+        "example": "stop",
+        "status": true,
+        "intent_keywords": ["stop", "halt", "cease", "pause", "freeze"]
+      }
+    },
+    "gathering": {
+      "mine": {
+        "syntax": "mine <block_type> <quantity> [range] [scout] [scout_tries]",
+        "args": "<block_type> <quantity> [range] [scout] [scout_tries]",
+        "description": "Mine specific blocks with optional scouting",
+        "example": "mine diamond_ore 3 32 true 5",
+        "status": true,
+        "intent_keywords": ["mine", "dig", "extract", "harvest blocks", "collect blocks"]
+      },
+      "collect": {
+        "syntax": "collect <item_type> [amount]",
+        "args": "<item_type> [amount]",
+        "description": "Collect items from the ground",
+        "example": "collect wood 64",
+        "status": false,
+        "intent_keywords": ["collect", "gather", "pick up", "retrieve", "grab"]
+      },
+      "harvest": {
+        "syntax": "harvest <crop_type>",
+        "args": "<crop_type>",
+        "description": "Harvest mature crops",
+        "example": "harvest wheat",
+        "status": false,
+        "intent_keywords": ["harvest", "farm", "crop", "reap", "gather crops"]
+      }
+    },
+    "combat": {
+      "attack": {
+        "syntax": "attack <target>",
+        "args": "<target>",
+        "description": "Attack a specific target",
+        "example": "attack zombie",
+        "status": true,
+        "intent_keywords": ["attack", "fight", "combat", "battle", "strike"]
+      },
+      "defend": {
+        "syntax": "defend",
+        "args": "",
+        "description": "Enter defensive mode",
+        "example": "defend",
+        "status": true,
+        "intent_keywords": ["defend", "guard", "protect", "defensive", "shield"]
+      },
+      "flee": {
+        "syntax": "flee [distance]",
+        "args": "[distance]",
+        "description": "Flee from danger",
+        "example": "flee 20",
+        "status": true,
+        "intent_keywords": ["flee", "escape", "run away", "retreat", "evacuate"]
+      }
+    },
+    "exploration": {
+      "explore": {
+        "syntax": "explore [radius]",
+        "args": "[radius]",
+        "description": "Explore area within radius",
+        "example": "explore 50",
+        "status": true,
+        "intent_keywords": ["explore", "scout area", "search", "investigate", "survey"]
+      },
+      "scout": {
+        "syntax": "scout <direction> [distance]",
+        "args": "<direction> [distance]",
+        "description": "Scout in a specific direction",
+        "example": "scout north 30",
+        "status": true,
+        "intent_keywords": ["scout", "reconnaissance", "survey direction", "check direction"]
+      },
+      "map": {
+        "syntax": "map [radius]",
+        "args": "[radius]",
+        "description": "Map surrounding area",
+        "example": "map 25",
+        "status": true,
+        "intent_keywords": ["map", "chart", "survey", "analyze area", "scan"]
+      }
+    },
+    "interaction": {
+      "interact": {
+        "syntax": "interact <stats|on|off>",
+        "args": "<stats|on|off>",
+        "description": "Manage interaction system",
+        "example": "interact stats",
+        "status": true,
+        "intent_keywords": ["interact", "social", "conversation", "chat mode"]
+      },
+    },
+    "utility": {
+      "status": {
+        "syntax": "status",
+        "args": "",
+        "description": "Show detailed bot status",
+        "example": "status",
+        "status": true,
+        "intent_keywords": ["status", "info", "state", "condition", "health"]
+      },
+      "inventory": {
+        "syntax": "inventory",
+        "args": "",
+        "description": "Show bot inventory",
+        "example": "inventory",
+        "status": true,
+        "intent_keywords": ["inventory", "items", "belongings", "storage", "bag"]
+      },
+      "help": {
+        "syntax": "help [category|command]",
+        "args": "[category|command]",
+        "description": "Show help information",
+        "example": "help mining",
+        "status": true,
+        "intent_keywords": ["help", "commands", "usage", "guide", "manual"]
+      }
+    },
+    "connection": {
+      "connect": {
+        "syntax": "connect",
+        "args": "",
+        "description": "Connect to Minecraft server",
+        "example": "connect",
+        "status": false,
+        "intent_keywords": ["connect", "join", "login", "enter server"]
+      },
+      "disconnect": {
+        "syntax": "disconnect",
+        "args": "",
+        "description": "Disconnect from server",
+        "example": "disconnect",
+        "status": false,
+        "intent_keywords": ["disconnect", "leave", "logout", "exit server"]
+      },
+      "reconnect": {
+        "syntax": "reconnect",
+        "args": "",
+        "description": "Disconnect and reconnect",
+        "example": "reconnect",
+        "status": false,
+        "intent_keywords": ["reconnect", "refresh connection", "restart connection"]
+      }
+    },
+    "communication": {
+      "chat": {
+        "syntax": "chat <message>",
+        "args": "<message>",
+        "description": "Send chat message",
+        "example": "chat Hello everyone!",
+        "status": false,
+        "intent_keywords": ["chat", "say", "speak", "message", "talk"]
+      },
+      "say": {
+        "syntax": "say <message>",
+        "args": "<message>",
+        "description": "Send chat message (alias for chat)",
+        "example": "say Hello world!",
+        "status": false,
+        "intent_keywords": ["say", "speak", "tell", "announce"]
+      }
+    },
+    "information": {
+      "players": {
+        "syntax": "players",
+        "args": "",
+        "description": "List online players",
+        "example": "players",
+        "status": false,
+        "intent_keywords": ["players", "online", "who", "list players"]
+      },
+      "entities": {
+        "syntax": "entities",
+        "args": "",
+        "description": "List nearby entities",
+        "example": "entities",
+        "status": false,
+        "intent_keywords": ["entities", "mobs", "nearby", "creatures"]
+      },
+      "config": {
+        "syntax": "config",
+        "args": "",
+        "description": "Show current configuration",
+        "example": "config",
+        "status": false,
+        "intent_keywords": ["config", "configuration", "settings", "setup"]
+      }
+    },
+    "targeting": {
+      "targeting": {
+        "syntax": "targeting",
+        "args": "",
+        "description": "Show bot targeting help",
+        "example": "targeting",
+        "status": true,
+        "intent_keywords": ["targeting", "control", "commands", "individual control"]
+      }
+    }
+  },
+  "categories": {
+    "movement": "Movement and navigation commands",
+    "gathering": "Resource gathering and mining commands",
+    "combat": "Combat and defense commands",
+    "exploration": "Exploration and scouting commands",
+    "interaction": "Social interaction commands",
+    "utility": "General utility commands",
+    "connection": "Server connection commands (REPL only)",
+    "communication": "Chat and communication commands (REPL only)",
+    "information": "Information and status commands (REPL only)",
+    "targeting": "Bot targeting and control help"
+  },
+  "meta": {
+    "version": "1.0.0",
+    "last_updated": "2024-01-01",
+    "total_commands": 23
+  }
+}

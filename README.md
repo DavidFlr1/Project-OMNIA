@@ -1,123 +1,167 @@
-<aside>
-👉 **Summary**
-Project OMNIA (Organized Minecraft Neural Intelligent Agents) its a Minecraft Bot Civilization project that looks to fill a world autonomous players capable to perform any in-game mechanic (farm, mine, fight, trade, build, eat, chat, etc) as well as to interact between bots to create significant and persistent connections with the common objective to organize and build an ecosystem.
-We are looking to recreate the paper presented by Project Sid from AlteraAI listed here: https://github.com/PrismarineJS/mineflayer
-</aside>
+# Project OMNIA - Minecraft Bot Civilization
 
-### Problem Statement
+Project OMNIA (Organized Minecraft Neural Intelligent Agents) is a Minecraft Bot Civilization project that creates autonomous players capable of performing in-game mechanics (farming, mining, fighting, trading, building, eating, chatting) and interacting with each other to form significant and persistent connections, with the common objective of organizing and building an ecosystem.
 
----
+## 🏗️ Project Structure
 
-Modern AI agents struggle to demonstrate persistent autonomy, adaptive behavior, and complex social interaction within dynamic, open-ended environments. Minecraft offers a rich testbed for embodied agents, yet most bot implementations remain narrowly scripted, brittle, and lack long-term memory or social coordination.
+```
+omnia/
+├── bot-agent/               # Node.js/TypeScript Mineflayer bot implementation
+│   ├── src/                 # Bot agent source code
+│   ├── Dockerfile           # Container definition
+│   └── package.json         # Dependencies and scripts
+├── bot-logic/               # Python AI decision engine
+│   ├── main.py              # FastAPI application
+│   ├── Dockerfile           # Container definition
+│   └── requirements.txt     # Python dependencies
+├── fastapi-bridge/          # Python LLM and RAG bridge
+│   ├── app/                 # FastAPI application
+│   ├── Dockerfile           # Container definition
+│   └── requirements.txt     # Python dependencies
+├── minecraft-server/        # Containerized Minecraft server
+│   ├── Dockerfile           # PaperMC server container
+│   ├── plugins/             # Server plugins
+│   └── scripts/             # Server utilities
+├── docker-compose.yml       # Multi-service orchestration
+├── .env                     # Environment configuration
+└── start-services.sh        # Service startup script
+```
 
-This project aims to build an AI-driven civilization within Minecraft where multiple bots, powered by modern AI architectures (LLMs, planners, memory systems), can:
+## 🛠️ Technologies
 
-- Autonomously perceive, act, and adapt.
-- Perform all in-game mechanics (farming, mining, fighting, trading, building, eating and chatting).
-- Build persistent relationships.
-- Evolve as a coherent society with emergent behavior.
+- **Bot Agent**: Node.js, TypeScript, Mineflayer
+- **Bot Logic**: Python, FastAPI, AI planning algorithms
+- **FastAPI Bridge**: Python, FastAPI, LLM integration
+- **Minecraft Server**: PaperMC 1.21, Docker
+- **Infrastructure**: Docker, Redis, Kubernetes (optional)
+- **AI**: LLM integration, RAG (Retrieval Augmented Generation)
 
-The core challenge is to integrate **autonomous agent control**, **real-time world feedback**, and **long-term memory** into a modular, scalable system.
+## 🚀 Getting Started
 
-### Success Metrics
+### Prerequisites
 
----
+- Node.js 18+
+- Python 3.9+
+- Docker and Docker Compose
+- OpenAI API key (for LLM integration)
 
-Success will be evaluated across **technical**, **behavioral**, and **systemic** dimensions:
+### Setup
 
-### **Autonomous Capability**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd omnia
+   ```
 
-- Bots can independently navigate, mine, build, farm, and fight without direct human input.
-- Task execution accuracy > 85% for multi-step tasks (e.g., “build a house” or “prepare food”).
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` with your OpenAI API key and other settings
 
-### **Social & Civilizational Behavior**
+3. **Install dependencies**
+   ```bash
+   npm run setup
+   ```
+   Or manually:
+   ```bash
+   npm install
+   cd bot-agent && npm install
+   cd ../bot-logic && pip install -r requirements.txt
+   cd ../fastapi-bridge && pip install -r requirements.txt
+   ```
 
-- Bots can form persistent relationships (e.g., alliances, rivalries) stored and retrieved from memory.
-- Bots coordinate to achieve shared goals (e.g., building a structure together).
-- Emergent behavior is observed: e.g., faction formation, leader-following, trade or defense.
+## 🎮 Running the Project
 
-### **System Stability & Performance**
+### Option 1: Using Docker Compose (All Services)
 
-- Average bot uptime > 95% over 24h cycles.
-- Inference latency per action < 500ms (LLM + decision loop).
-- Seamless scaling of up to 10 bots with synchronized memory access and minimal conflict.
+```bash
+# Start all services
+docker compose up
 
-### **Infrastructure Scalability**
+# Run in background
+docker compose up -d
 
-- Infrastructure can support expansion to multiple Minecraft worlds or simulation layers.
-- Deployment can be reproduced easily with containerization + GCP automation.
+# Stop all services
+docker compose down
+```
 
-### **User or Observer Evaluation**
+### Option 2: Start Services Individually
 
-- Human observers consistently identify bots as “lifelike” in behavior in blind tests.
-- Positive feedback from academic or gaming communities if released publicly.
+1. **Start Minecraft Server**
+   ```bash
+   cd minecraft-server
+   docker compose up -d
+   ```
 
-### 💁🏼‍♀️ In Scope
+2. **Start FastAPI Bridge**
+   ```bash
+   cd fastapi-bridge
+   python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+   ```
 
----
+3. **Start Bot Logic**
+   ```bash
+   cd bot-logic
+   python -m uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
 
-- Autonomously perceive, act, and adapt
-- Perform all in-game mechanics (farming, mining, fighting, trading, building, eating and chatting)
-- Build persistent relationships,
-- Evolve as a coherent society with emergent behavior.
+4. **Start Bot Agent**
+   ```bash
+   cd bot-agent
+   npm run dev
+   ```
 
-### 🙅🏼‍♂️ Out of Scope
+### Option 3: Using the Convenience Script
 
----
+```bash
+# Start all services
+./start-services.sh
+```
 
-- 
+## 🤖 Bot Interaction
 
-### 🤦🏼‍♀️ Risks
+### REPL Interface
 
----
+For direct bot testing and interaction:
+```bash
+cd bot-agent
+npm run repl
+```
 
-| Risk | Description | Mitigation |
-| --- | --- | --- |
-| **Model Latency** | LLM inference can slow down real-time decision making. | Use lightweight models or local inference for common decisions; cache recent outputs. |
-| **State Desync** | Bots may act on outdated or conflicting world states. | Centralized event bus or fast polling with diff updates. |
-| **Memory Complexity** | Storing and retrieving context-relevant memory across bots may get expensive or noisy. | Use structured memory (e.g., Firestore + embedding search) and decaying priorities. |
-| **GCP Cost Spikes** | Running LLMs, bots, and persistent systems may incur high costs over time. | Monitor billing; offload local runs during dev; use auto-scaling; GPU only when needed. |
-| **Security** | Exposed APIs (e.g., FastAPI) could be vulnerable to misuse. | Secure endpoints, validate all inputs, use rate-limiting + GCP IAM policies. |
-| **LLM Hallucinations** | Bots may act unpredictably or illogically due to model output. | Combine LLMs with symbolic reasoning or constraint filters for critical tasks. |
-| **Emergent Chaos** | Civilizations may collapse or behave nonsensically without guidance. | Seed with templates/goals and allow gradual learning; enforce simulation rules as needed. |
+Common commands:
+```
+bot> connect
+bot> goto 100 64 200
+bot> mine diamond_ore
+bot> explore 50
+```
 
-### 🤷🏼‍♂️ Open Questions
+### API Endpoints
 
-### Recommended settings
-- Install vsc extension: https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals
+- Bot Agent: `http://localhost:3001`
+- Bot Logic: `http://localhost:8000`
+- FastAPI Bridge: `http://localhost:8001`
 
+Example API request:
+```bash
+curl -X POST http://localhost:3001/command -H "Content-Type: application/json" -d '{"command":"goto 100 64 200"}'
+```
 
+## 🧪 Testing
 
+Test the LLM integration:
+```bash
+curl -X POST http://localhost:8001/chat -H "Content-Type: application/json" -d @test-request.json
+```
 
+## 📝 Development
 
-# Minecraft Bot Monorepo
+For VSCode users, install the recommended Terminals extension for easy service management:
+- [Terminals](https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals)
 
-A sophisticated multi-agent Minecraft bot system with AI decision making capabilities.
+## 📚 Documentation
 
-## Architecture
-
-This monorepo contains three main components:
-
-### 🤖 bot-agent (Node.js/TypeScript)
-- **Purpose**: Lightweight Mineflayer bot connection and command execution
-- **Features**: 
-  - Real-time Minecraft server connection
-  - Command system (movement, gathering, combat, exploration)
-  - REPL interface for testing
-  - REST API for external control
-  - Memory management with Redis support
-
-### 🧠 bot-logic (Python) 
-- **Purpose**: AI decision engine and multi-agent coordination
-- **Features**:
-  - Multi-agent behavior planning
-  - State management
-  - Task coordination
-  - Integration with Redis and Firestore
-
-### 🌉 fastapi-bridge (Python)
-- **Purpose**: LLM and RAG bridge for AI-powered decisions
-- **Features**:
-  - LLM integration
-  - RAG (Retrieval Augmented Generation)
+For more detailed information:
+- [Bot Agent README](bot-agent/README.md)
   - Communication bridge between bots and AI models

@@ -27,16 +27,38 @@
       "color": "terminal.ansiCyan",
       "icon": "server-environment",
       "commands": [
-        "cd minecraft-server"
+        "cd minecraft-server",
+        "docker compose up --build"
       ],
+      "recycle": true
+    },
+    {
+      "name": "bot-logic",
+      "description": "Terminal to execute the bot-logic",
+      "commands": [
+        "cd bot-logic",
+        "python -m uvicorn main:app --host 0.0.0.0 --port 8000"
+      ],
+      "color": "terminal.ansiMagenta",
+      "icon": "debug-breakpoint-log-unverified",
+      "recycle": true
+    },
+    {
+      "name": "fastapi-bridge",
+      "description": "Terminal to execute the fastapi-bridge",
+      "commands": [
+        "cd fastapi-bridge",
+        "python -m uvicorn app.main:app --host 0.0.0.0 --port 8001"
+      ],
+      "color": "terminal.ansiBlack",
+      "icon": "server-hierarchy",
       "recycle": true
     },
     {
       "name": "bot-1",
       "description": "Terminal to execute a bot",
       "commands": [
-        "cd bot-agent",
-        ""
+        "cd bot-agent"
       ],
       "color": "terminal.ansiWhite",
       "icon": "robot",
@@ -45,10 +67,10 @@
     },
     {
       "name": "bot-2",
+      "split": "bot-1",
       "description": "Terminal to execute a bot",
       "commands": [
-        "cd bot-agent",
-        ""
+        "cd bot-agent"
       ],
       "color": "terminal.ansiWhite",
       "icon": "robot",

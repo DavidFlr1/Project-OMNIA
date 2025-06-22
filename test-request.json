@@ -1,0 +1,26 @@
+{
+  "test_fastapi_bridge": {
+    "url": "http://localhost:8001/chat",
+    "method": "POST",
+    "body": {
+      "message": "What should I build in Minecraft?",
+      "context": {
+        "health": 20,
+        "position": { "x": 100, "y": 64, "z": 100 }
+      }
+    }
+  },
+  "test_bot_logic": {
+    "url": "http://localhost:8000/chat",
+    "method": "POST",
+    "body": {
+      "message": "Hey bot, are you an AI?",
+      "context": {
+        "health": 20,
+        "food": 18,
+        "position": { "x": 0, "y": 64, "z": 0 },
+        "inventory": { "stone": 32, "wood": 16 }
+      }
+    }
+  }
+}

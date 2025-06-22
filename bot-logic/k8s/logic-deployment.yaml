@@ -1,0 +1,20 @@
+# Placeholder for Kubernetes deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-logic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot-logic
+  template:
+    metadata:
+      labels:
+        app: bot-logic
+    spec:
+      containers:
+      - name: bot-logic
+        image: bot-logic:latest
+        ports:
+        - containerPort: 8000

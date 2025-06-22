@@ -1,6 +1,7 @@
-## Quick Start
+# Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - Python 3.9+
 - Redis (optional, for persistent memory)
@@ -9,52 +10,59 @@
 ### Installation
 
 1. **Clone and setup the monorepo:**
-\`\`\`bash
-git clone <repository-url>
-cd minecraft-bot-monorepo
-npm run setup
-\`\`\`
+   ```bash
+   git clone <repository-url>
+   cd OMNIA
+   npm run setup
+   ```
 
 2. **Configure environment:**
-\`\`\`bash
-cd bot-agent
-cp .env.example .env
-# Edit .env with your Minecraft server details
-\`\`\`
+   ```bash
+   cd bot-agent
+   cp .env.example .env
+   ```
+
+## Edit .env with your Minecraft server details
 
 3. **Start the bot agent:**
-\`\`\`bash
-# Development mode with hot reload
-npm run dev:bot-agent
+```
+  # Development mode with hot reload
+  npm run dev:bot-agent
 
-# Or use the REPL for testing
-cd bot-agent
-npm run repl (recommended)
-\`\`\`
+  # Or use the REPL for testing
+  cd bot-agent
+  npm run repl
+```
 
 ## Bot Agent Usage
 
 ### REPL Commands
-\`\`\`bash
+
+```bash
+
 # Connection
-connect              # Connect to Minecraft server
-disconnect           # Disconnect from server
-status               # Show bot status
+
+connect # Connect to Minecraft server
+disconnect # Disconnect from server
+status # Show bot status
 
 # Chat
-chat <message>       # Send chat message
+
+chat <message> # Send chat message
 
 # Bot Commands (when connected)
+
 _On the REPL, you can execute bot commands directly. For in-game use, prefix commands with '!' and target the bot._
-goto <x> <y> <z>     # Move to coordinates
-follow <player>      # Follow a player
-mine <block>         # Mine specific blocks
-explore [radius]     # Explore area
-attack <target>      # Combat actions
-\`\`\`
+goto <x> <y> <z> # Move to coordinates
+follow <player> # Follow a player
+mine <block> # Mine specific blocks
+explore [radius] # Explore area
+attack <target> # Combat actions
+```
 
 ### API Endpoints
-\`\`\`bash
+
+```bash
 # Health check
 GET /health
 
@@ -78,67 +86,71 @@ GET /inventory
 
 # Get nearby entities
 GET /entities
-\`\`\`
+```
 
 ### Example Usage
 
 **Basic Movement:**
-\`\`\`bash
+```bash
 bot> connect
 bot> goto 100 64 200
 bot> follow Steve
 bot> patrol 0 0 100 100
-\`\`\`
+```
 
 **Resource Gathering:**
-\`\`\`bash
+```bash
 bot> mine diamond_ore
 bot> collect wood 64
 bot> harvest wheat
-\`\`\`
+```
 
 **Exploration:**
-\`\`\`bash
+```bash
 bot> explore 50
 bot> scout north 30
 bot> map 25
-\`\`\`
+```
 
 ## Development
 
 ### Project Structure
-\`\`\`
+
+```
 minecraft-bot-monorepo/
-├── bot-agent/                 # Node.js bot agent
-│   ├── src/
-│   │   ├── index.ts          # Entry point
-│   │   ├── bot.ts            # Main bot class
-│   │   ├── commands/         # Command implementations
-│   │   ├── logic/            # Agent logic and memory
-│   │   ├── api/              # REST API server
-│   │   └── utils.ts          # Utilities
-│   ├── tests/                # Test files
-│   └── Dockerfile
-├── bot-logic/                # Python AI logic (coming next)
-├── fastapi-bridge/           # Python FastAPI bridge (coming next)
-└── package.json              # Monorepo root
-\`\`\`
+├── bot-agent/ # Node.js bot agent
+│ ├── src/
+│ │ ├── index.ts # Entry point
+│ │ ├── bot.ts # Main bot class
+│ │ ├── commands/ # Command implementations
+│ │ ├── logic/ # Agent logic and memory
+│ │ ├── api/ # REST API server
+│ │ └── utils.ts # Utilities
+│ ├── tests/ # Test files
+│ └── Dockerfile
+├── bot-logic/ # Python AI logic (coming next)
+├── fastapi-bridge/ # Python FastAPI bridge (coming next)
+└── package.json # Monorepo root
+```
 
 ### Available Scripts
-\`\`\`bash
+
+```bash
 # Bot Agent
-npm run dev:bot-agent         # Development mode
-npm run build:bot-agent       # Build TypeScript
-npm run start:bot-agent       # Start production
-npm run test:bot-agent        # Run tests
+npm run dev:bot-agent # Development mode
+npm run build:bot-agent # Build TypeScript
+npm run start:bot-agent # Start production
+npm run test:bot-agent # Run tests
 
 # REPL
-cd bot-agent && npm run repl  # Interactive testing
-\`\`\`
+cd bot-agent && npm run repl # Interactive testing
+```
 
 ### Environment Variables
-\`\`\`bash
+
+```bash
 # Minecraft Server
+
 MINECRAFT_HOST=localhost
 MINECRAFT_PORT=25565
 MINECRAFT_USERNAME=MinecraftBot
@@ -153,11 +165,12 @@ API_PORT=3001
 # Services
 BOT_LOGIC_URL=http://localhost:8000
 FASTAPI_BRIDGE_URL=http://localhost:8001
-\`\`\`
+```
 
 ## Features
 
 ### ✅ Implemented (bot-agent)
+
 - [x] Mineflayer bot connection
 - [x] Command system (move, gather, combat, explore)
 - [x] Memory management with Redis support
@@ -168,28 +181,13 @@ FASTAPI_BRIDGE_URL=http://localhost:8001
 - [x] Docker support
 
 ### 🚧 Coming Next
+
 - [ ] bot-logic Python service
 - [ ] fastapi-bridge LLM integration
 - [ ] Multi-agent coordination
 - [ ] AI decision making
 - [ ] Kubernetes deployment
 - [ ] Web dashboard
-
-## Docker Support
-
-\`\`\`bash
-# Build bot-agent image
-cd bot-agent
-docker build -t minecraft-bot-agent .
-
-# Run with environment variables
-docker run -d \
-  --name minecraft-bot \
-  -p 3001:3001 \
-  -e MINECRAFT_HOST=your-server.com \
-  -e MINECRAFT_USERNAME=BotName \
-  minecraft-bot-agent
-\`\`\`
 
 ## Contributing
 
