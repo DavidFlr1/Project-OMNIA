@@ -118,59 +118,6 @@ export function getHelp(query?: string): string[] {
   return helpLines
 }
 
-// Get command status
-export function getCommandStatus(commandName: string): boolean | null {
-  const config = loadCommandsConfig()
-
-  for (const category of Object.values(config.commands)) {
-    const commands = category as Record<string, any>
-    if (commands[commandName]) {
-      return commands[commandName].status
-    }
-  }
-
-  return null
-}
-
-// Get all working commands
-export function getWorkingCommands(): string[] {
-  const config = loadCommandsConfig()
-  const workingCommands: string[] = []
-
-  Object.values(config.commands).forEach((category: any) => {
-    Object.entries(category).forEach(([cmdName, cmdInfo]: [string, any]) => {
-      if (cmdInfo.status) {
-        workingCommands.push(cmdName)
-      }
-    })
-  })
-
-  return workingCommands
-}
-
-// Get commands by category
-export function getCommandsByCategory(categoryName: string): Record<string, any> {
-  const config = loadCommandsConfig()
-  return config.commands[categoryName] || {}
-}
-
-// Search commands by intent keywords
-export function searchCommandsByIntent(query: string): string[] {
-  const config = loadCommandsConfig()
-  const matches: string[] = []
-  const queryLower = query.toLowerCase()
-
-  Object.values(config.commands).forEach((category: any) => {
-    Object.entries(category).forEach(([cmdName, cmdInfo]: [string, any]) => {
-      if (cmdInfo.intent_keywords.some((keyword: string) => keyword.includes(queryLower))) {
-        matches.push(cmdName)
-      }
-    })
-  })
-
-  return matches
-}
-
 // Utility function to wait/sleep
 export function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -217,34 +164,6 @@ export function formatPosition(pos: { x: number; y: number; z: number }): string
   return `(${Math.floor(pos.x)}, ${Math.floor(pos.y)}, ${Math.floor(pos.z)})`
 }
 
-// Utility function to parse command arguments
-export function parseArgs(args: string[]): Record<string, any> {
-  const parsed: Record<string, any> = {}
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i]
-
-    if (arg.startsWith("--")) {
-      const key = arg.slice(2)
-      const nextArg = args[i + 1]
-
-      if (nextArg && !nextArg.startsWith("--")) {
-        parsed[key] = nextArg
-        i++ // Skip next argument as it's a value
-      } else {
-        parsed[key] = true // Flag without value
-      }
-    }
-  }
-
-  return parsed
-}
-
-// Utility function to clamp values
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
-}
-
 // Utility function to generate random position within radius
 export function randomPositionInRadius(center: { x: number; z: number }, radius: number): { x: number; z: number } {
   const angle = Math.random() * 2 * Math.PI
@@ -281,3 +200,4 @@ export function isLookingAtBot(playerEntity: any, botEntity: any, threshold = 0.
 export function isPlayerNearby(playerEntity: any, botEntity: any, maxDistance = 4): boolean {
   return botEntity.position.distanceTo(playerEntity.position) <= maxDistance
 }
+

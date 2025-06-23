@@ -17,6 +17,14 @@
         "status": true,
         "intent_keywords": ["follow", "chase", "track", "accompany", "shadow"]
       },
+      "reach": {
+        "syntax": "reach <player>",
+        "args": "<player>",
+        "description": "Reach a specific player",
+        "example": "reach Steve",
+        "status": true,
+        "intent_keywords": ["reach", "find", "approach", "get to"]
+      },
       "patrol": {
         "syntax": "patrol <x1> <z1> <x2> <z2>",
         "args": "<x1> <z1> <x2> <z2>",
@@ -25,13 +33,13 @@
         "status": true,
         "intent_keywords": ["patrol", "guard", "watch", "monitor", "circuit"]
       },
-      "stop": {
-        "syntax": "stop",
+      "stay": {
+        "syntax": "stay",
         "args": "",
         "description": "Stop all movement",
-        "example": "stop",
+        "example": "stay",
         "status": true,
-        "intent_keywords": ["stop", "halt", "cease", "pause", "freeze"]
+        "intent_keywords": ["stay", "halt", "cease", "pause", "freeze"]
       }
     },
     "gathering": {
@@ -44,19 +52,19 @@
         "intent_keywords": ["mine", "dig", "extract", "harvest blocks", "collect blocks"]
       },
       "collect": {
-        "syntax": "collect <item_type> [amount]",
-        "args": "<item_type> [amount]",
+        "syntax": "collect <item_type> [amount] [range]",
+        "args": "<item_type> [amount] [range]",
         "description": "Collect items from the ground",
-        "example": "collect wood 64",
-        "status": false,
+        "example": "collect oak_planks 64 32",
+        "status": true,
         "intent_keywords": ["collect", "gather", "pick up", "retrieve", "grab"]
       },
       "harvest": {
-        "syntax": "harvest <crop_type>",
-        "args": "<crop_type>",
+        "syntax": "harvest <crop_type> [quantity] [range]",
+        "args": "<crop_type> [quantity] [range]",
         "description": "Harvest mature crops",
-        "example": "harvest wheat",
-        "status": false,
+        "example": "harvest wheat 3 32",
+        "status": true,
         "intent_keywords": ["harvest", "farm", "crop", "reap", "gather crops"]
       }
     },
@@ -112,16 +120,6 @@
         "intent_keywords": ["map", "chart", "survey", "analyze area", "scan"]
       }
     },
-    "interaction": {
-      "interact": {
-        "syntax": "interact <stats|on|off>",
-        "args": "<stats|on|off>",
-        "description": "Manage interaction system",
-        "example": "interact stats",
-        "status": true,
-        "intent_keywords": ["interact", "social", "conversation", "chat mode"]
-      },
-    },
     "utility": {
       "status": {
         "syntax": "status",
@@ -139,13 +137,23 @@
         "status": true,
         "intent_keywords": ["inventory", "items", "belongings", "storage", "bag"]
       },
+      "disable": {
+        "syntax": "disable <comands | chat | all> [on|off]",
+        "args": "<comands | chat | all> [on|off]",
+        "description": "Manage disable system",
+        "example": "disable comands on",
+        "status": false,
+        "intent_keywords": ["disable", "enable", "activate", "deactivate"]
+      }
+    },
+    "help": {
       "help": {
         "syntax": "help [category|command]",
         "args": "[category|command]",
         "description": "Show help information",
         "example": "help mining",
         "status": true,
-        "intent_keywords": ["help", "commands", "usage", "guide", "manual"]
+        "intent_keywords": ["commands", "usage", "guide", "manual"]
       }
     },
     "connection": {

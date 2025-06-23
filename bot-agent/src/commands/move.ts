@@ -6,6 +6,7 @@ export class MoveCommands {
   private isPatrolling = false;
   private patrolPoints: Array<{ x: number; z: number }> = [];
   private currentPatrolIndex = 0;
+  private _followInterval: NodeJS.Timeout | null = null;
 
   async goto(bot: MineflayerBot, args: string[]): Promise<void> {
     if (args.length < 3) {
@@ -32,12 +33,54 @@ export class MoveCommands {
       bot.chat("Arrived at destination");
       logger.info("Successfully reached destination");
     } catch (error) {
-      logger.error("Failed to reach destination:", error);
-      bot.chat("Failed to reach destination");
+      logger.error("Having trouble reaching destination:", error);
+      bot.chat("Having trouble reaching destination");
     }
   }
 
   async follow(bot: MineflayerBot, args: string[]): Promise<void> {
+    if (args.length < 1) {
+      bot.chat("Usage: follow <player>");
+      return;
+    }
+
+    const playerName = args[0];
+    const target = bot.players[playerName];
+
+    if (!target || !target.entity) {
+      bot.chat(`Player ${playerName} not found`);
+      return;
+    }
+
+    try {
+      logger.info(`Following player: ${playerName}`);
+      bot.chat(`Following ${playerName}`);
+
+      // Set up continuous following
+      const followInterval = setInterval(async () => {
+        // Check if player still exists
+        const player = bot.players[playerName];
+        if (!player || !player.entity) {
+          clearInterval(followInterval);
+          logger.info(`Player ${playerName} no longer found, stopping follow`);
+          bot.chat(`Player ${playerName} lost, stopping follow`);
+          return;
+        }
+
+        // Update goal to follow player's current position
+        const goal = new goals.GoalFollow(player.entity, 2);
+        bot.pathfinder.setGoal(goal);
+      }, 1000); // Update path every second
+
+      // Store the interval so it can be cleared by the stay command
+      this._followInterval = followInterval;
+    } catch (error) {
+      logger.error("Failed to follow player:", error);
+      bot.chat("Failed to follow player");
+    }
+  }
+
+  async reach(bot: MineflayerBot, args: string[]): Promise<void> {
     if (args.length < 1) {
       bot.chat("Usage: follow <player>");
       return;
@@ -112,7 +155,13 @@ export class MoveCommands {
     }
   }
 
-  async stop(bot: MineflayerBot): Promise<void> {
+  async stay(bot: MineflayerBot): Promise<void> {
+    // Clear any active follow interval
+    if (this._followInterval) {
+      clearInterval(this._followInterval);
+      this._followInterval = null;
+    }
+    
     this.isPatrolling = false;
     bot.pathfinder.stop();
     bot.chat("Movement stopped");

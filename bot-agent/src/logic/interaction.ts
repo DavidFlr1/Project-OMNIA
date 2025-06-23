@@ -131,7 +131,7 @@ export class InteractionManager {
     return false;
   }
 
-  // Responses
+  // Conversation
   private async respondToPlayer(username: string, message: string): Promise<void> {
     const now = Date.now();
 

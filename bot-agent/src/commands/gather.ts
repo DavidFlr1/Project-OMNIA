@@ -81,44 +81,90 @@ export class GatherCommands {
 
   async collect(bot: MineflayerBot, args: string[]): Promise<void> {
     if (args.length < 1) {
-      bot.chat("Usage: collect <item_type> [amount]");
+      bot.chat("Usage: collect <item_type> [amount] [range]");
       return;
     }
 
-    const itemType = args[0];
+    const itemType = args[0].toLowerCase();
     const amount = args[1] ? Number.parseInt(args[1]) : 1;
+    const range = args[2] ? Number.parseInt(args[2]) : 32;
 
     try {
-      logger.info(`Collecting ${amount} ${itemType}`);
-      bot.chat(`Collecting ${amount} ${itemType}...`);
+      logger.info(`Collecting ${amount} ${itemType} from the ground within range ${range}`);
+      bot.chat(`Looking for ${itemType} on the ground...`);
 
-      // Find blocks to collect
-      const blocks = bot.findBlocks({
-        matching: (block) => block.name === itemType,
-        maxDistance: 32,
-        count: amount,
+      // Get all entities
+      const allEntities = Object.values(bot.entities);
+      
+      // Filter entities by type and range
+      const matchingEntities = allEntities.filter(entity => {
+        // Filter by entity type (both 'item' and 'other' can be dropped items)
+        if (entity.type !== 'object' && entity.name !== 'item') return false;
+        
+        // Filter by distance
+        const distance = entity.position.distanceTo(bot.entity.position);
+        if (distance > range) return false;
+        
+        // Check if the entity's metadata contains the item we're looking for
+        if (!entity.metadata) return false;
+        
+        // Find the metadata entry with itemId
+        const itemMetadata: any = Object.values(entity.metadata).find(
+          (meta: any) => meta && meta.itemId !== undefined
+        );
+        
+        if (!itemMetadata) return false;
+        
+        // Get the item from registry using itemId
+        const registryItem = bot.registry.items[itemMetadata?.itemId];
+        if (!registryItem) return false;
+        
+        // Check if the item name or displayName matches what we're looking for
+        const itemName = registryItem.name?.toLowerCase() || '';
+        const displayName = registryItem.displayName?.toLowerCase() || '';
+        
+        return itemName.includes(itemType) || displayName.includes(itemType);
       });
 
-      if (blocks.length === 0) {
-        bot.chat(`No ${itemType} found nearby`);
+      if (matchingEntities.length === 0) {
+        bot.chat(`No ${itemType} found on the ground within range ${range}`);
         return;
       }
 
+      bot.chat(`Found ${matchingEntities.length} ${itemType} on the ground`);
+      
+      // Sort by distance to prioritize closest items
+      matchingEntities.sort((a, b) => 
+        a.position.distanceTo(bot.entity.position) - b.position.distanceTo(bot.entity.position)
+      );
+      
       let collected = 0;
-      for (const blockPos of blocks.slice(0, amount)) {
+      for (const entity of matchingEntities.slice(0, amount)) {
         try {
-          const block = bot.blockAt(blockPos);
-          if (block && block.name === itemType) {
-            await bot.collectBlock.collect(block);
+          logger.info(`Moving to collect item at ${JSON.stringify(entity.position)}`);
+          
+          // Move to the item
+          const goal = new goals.GoalNear(entity.position.x, entity.position.y, entity.position.z, 1);
+          await bot.pathfinder.goto(goal);
+          
+          // Wait a moment to pick up the item (happens automatically when close enough)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Check if the entity still exists (if not, we probably collected it)
+          if (!bot.entities[entity.id]) {
             collected++;
+            bot.chat(`Collected ${collected}/${amount} ${itemType}`);
           }
+          
+          // If we've collected enough, stop
+          if (collected >= amount) break;
         } catch (error) {
-          logger.warn(`Failed to collect block at ${blockPos}:`, error);
+          logger.warn(`Failed to collect item at ${entity.position}:`, error);
         }
       }
 
-      bot.chat(`Successfully collected ${collected} ${itemType}`);
-      logger.info(`Successfully collected ${collected} ${itemType}`);
+      bot.chat(`Successfully collected ${collected} ${itemType} from the ground`);
+      logger.info(`Successfully collected ${collected} ${itemType} from the ground`);
     } catch (error) {
       logger.error("Collection failed:", error);
       bot.chat("Collection failed");
@@ -127,12 +173,26 @@ export class GatherCommands {
 
   async harvest(bot: MineflayerBot, args: string[]): Promise<void> {
     if (args.length < 1) {
-      bot.chat("Usage: harvest <crop_type>");
+      bot.chat("Usage: harvest <crop_type> [quantity] [range]");
       return;
     }
 
-    const cropType = args[0];
-    const range = 16;
+    // Normalize crop type to match its plural form
+    let cropType = args[0];
+    const cropMappings: Record<string, string> = {
+      "carrot": "carrots",
+      "potato": "potatoes",
+      "beetroot": "beetroots",
+      "wheat": "wheat",
+    };
+    
+    // Check if we need to convert from singular to plural
+    if (cropMappings[cropType]) {
+      cropType = cropMappings[cropType];
+    }
+    
+    const quantity = args[1] ? parseInt(args[1]) : 10;
+    const range = args[2] ? parseInt(args[2]) : 32;
 
     try {
       logger.info(`Harvesting ${cropType} within range ${range}`);
@@ -144,7 +204,7 @@ export class GatherCommands {
           return block.name === cropType && this.isMatureCrop(block);
         },
         maxDistance: range,
-        count: 10, // Harvest up to 10 crops
+        count: quantity,
       });
 
       if (crops.length === 0) {
@@ -175,6 +235,7 @@ export class GatherCommands {
     }
   }
 
+  // Helper functions
   private isMatureCrop(block: any): boolean {
     // Check if crop is mature based on metadata/state
     // This is a simplified check - in practice, you'd check the block state

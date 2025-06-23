@@ -7,4 +7,4 @@ services:
     volumes:
       - ./world:/data/world     # persist local world
       - ./world/ops.json:/data/ops.json  # ensure ops file is in correct location
-      # - ./plugins:/data/plugins  # Mount your plugins folder into the server
+      - ./plugins:/data/plugins  # Mount your plugins folder into the server
