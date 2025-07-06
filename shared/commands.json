@@ -42,6 +42,32 @@
         "intent_keywords": ["stay", "halt", "cease", "pause", "freeze"]
       }
     },
+    "exploration": {
+      "explore": {
+        "syntax": "explore [radius]",
+        "args": "[radius]",
+        "description": "Explore area within radius",
+        "example": "explore 50",
+        "status": true,
+        "intent_keywords": ["explore", "scout area", "search", "investigate", "survey"]
+      },
+      "scout": {
+        "syntax": "scout <direction> [distance]",
+        "args": "<direction> [distance]",
+        "description": "Scout in a specific direction",
+        "example": "scout north 30",
+        "status": true,
+        "intent_keywords": ["scout", "reconnaissance", "survey direction", "check direction"]
+      },
+      "map": {
+        "syntax": "map [radius]",
+        "args": "[radius]",
+        "description": "Map surrounding area",
+        "example": "map 25",
+        "status": true,
+        "intent_keywords": ["map", "chart", "survey", "analyze area", "scan"]
+      }
+    },
     "gathering": {
       "mine": {
         "syntax": "mine <block_type> <quantity> [range] [scout] [scout_tries]",
@@ -66,6 +92,16 @@
         "example": "harvest wheat 3 32",
         "status": true,
         "intent_keywords": ["harvest", "farm", "crop", "reap", "gather crops"]
+      }
+    },
+    "building": {
+      "place": {
+        "syntax": "place <position(s)> <block> [invasive|non-invasive]",
+        "args": "<position(s)> <block> [invasive|non-invasive]",
+        "description": "Place blocks at specific positions",
+        "example": "single 'place 10 64 10 stone invasive' or multiple 'place [10 64 10, 15 64 15, 20 64 20] stone non-invasive' or range 'place 10 64 10 15 64 15 stone non-invasive'",
+        "status": true,
+        "intent_keywords": ["place", "build", "construct", "put", "lay"]
       }
     },
     "combat": {
@@ -94,32 +130,6 @@
         "intent_keywords": ["flee", "escape", "run away", "retreat", "evacuate"]
       }
     },
-    "exploration": {
-      "explore": {
-        "syntax": "explore [radius]",
-        "args": "[radius]",
-        "description": "Explore area within radius",
-        "example": "explore 50",
-        "status": true,
-        "intent_keywords": ["explore", "scout area", "search", "investigate", "survey"]
-      },
-      "scout": {
-        "syntax": "scout <direction> [distance]",
-        "args": "<direction> [distance]",
-        "description": "Scout in a specific direction",
-        "example": "scout north 30",
-        "status": true,
-        "intent_keywords": ["scout", "reconnaissance", "survey direction", "check direction"]
-      },
-      "map": {
-        "syntax": "map [radius]",
-        "args": "[radius]",
-        "description": "Map surrounding area",
-        "example": "map 25",
-        "status": true,
-        "intent_keywords": ["map", "chart", "survey", "analyze area", "scan"]
-      }
-    },
     "utility": {
       "status": {
         "syntax": "status",
@@ -136,6 +146,38 @@
         "example": "inventory",
         "status": true,
         "intent_keywords": ["inventory", "items", "belongings", "storage", "bag"]
+      },
+      "equip": {
+        "syntax": "equip <item>",
+        "args": "<item> [hand | offhand | head | torso | legs | feet]",
+        "description": "Equip specific item",
+        "example": "equip diamond_pickaxe hand",
+        "status": true,
+        "intent_keywords": ["equip", "wear", "hold", "wield", "use item"]
+      },
+      "drop": {
+        "syntax": "drop <item> [quantity]",
+        "args": "<item> [quantity]",
+        "description": "Drop specific item",
+        "example": "drop diamond 3",
+        "status": true,
+        "intent_keywords": ["drop", "throw", "discard", "leave", "remove item"]
+      },
+      "interact": {
+        "syntax": "interact <block> [type]",
+        "args": "<block> [type]",
+        "description": "Interact with a block",
+        "example": "interact lever hand",
+        "status": true,
+        "intent_keywords": ["interact", "use", "activate", "perform action on"]
+      },
+      "store": {
+        "syntax": "store <pick | put> <x> <y> <z> <item_name> [quantity]",
+        "args": "<pick | put> <x> <y> <z> <item_name> [quantity]",
+        "description": "Store item in chest",
+        "example": "store pick 100 64 200 diamond 5",
+        "status": true,
+        "intent_keywords": ["store", "save", "keep", "preserve", "put away"]
       },
       "disable": {
         "syntax": "disable <comands | chat | all> [on|off]",
@@ -156,6 +198,7 @@
         "intent_keywords": ["commands", "usage", "guide", "manual"]
       }
     },
+
     "connection": {
       "connect": {
         "syntax": "connect",
@@ -232,7 +275,7 @@
         "args": "",
         "description": "Show bot targeting help",
         "example": "targeting",
-        "status": true,
+        "status": false,
         "intent_keywords": ["targeting", "control", "commands", "individual control"]
       }
     }
@@ -244,6 +287,7 @@
     "exploration": "Exploration and scouting commands",
     "interaction": "Social interaction commands",
     "utility": "General utility commands",
+    
     "connection": "Server connection commands (REPL only)",
     "communication": "Chat and communication commands (REPL only)",
     "information": "Information and status commands (REPL only)",

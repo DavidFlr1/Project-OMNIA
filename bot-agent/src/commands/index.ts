@@ -1,7 +1,9 @@
 import type { Bot as MineflayerBot } from "mineflayer";
+import { Bot } from "../bot";
 import type { Memory } from "../logic/memory";
 import { MoveCommands } from "./move";
 import { GatherCommands } from "./gather";
+import { BuildCommands } from "./build";
 import { CombatCommands } from "./combat";
 import { ExploreCommands } from "./explore";
 import { UtilityCommands } from "./utility";
@@ -9,15 +11,19 @@ import { logger } from "../utils";
 import { getHelp } from "../utils";
 
 export class CommandHandler {
+  private featureList: Set<{name: string, status: boolean}>;
   private moveCommands: MoveCommands;
   private gatherCommands: GatherCommands;
+  private build: BuildCommands;
   private combatCommands: CombatCommands;
   private exploreCommands: ExploreCommands;
   private utilityCommands: UtilityCommands;
 
   constructor() {
+    this.featureList = Bot.features;
     this.moveCommands = new MoveCommands();
     this.gatherCommands = new GatherCommands();
+    this.build = new BuildCommands();
     this.combatCommands = new CombatCommands();
     this.exploreCommands = new ExploreCommands();
     this.utilityCommands = new UtilityCommands();
@@ -25,14 +31,12 @@ export class CommandHandler {
 
   async execute(command: string, bot: MineflayerBot, memory: Memory): Promise<void> {
     const [action, ...args] = command.trim().split(" ");
-
     logger.info(`Executing command: ${action} with args: ${args.join(" ")}`);
 
     try {
       switch (action.toLowerCase()) {
         // Movement commands
         case "goto":
-        case "move":
           await this.moveCommands.goto(bot, args);
           break;
         case "follow":
@@ -48,6 +52,17 @@ export class CommandHandler {
           await this.moveCommands.stay(bot);
           break;
 
+        // Exploration commands
+        case "explore":
+          await this.exploreCommands.explore(bot, args);
+          break;
+        case "scout":
+          await this.exploreCommands.scout(bot, args);
+          break;
+        case "map":
+          await this.exploreCommands.mapArea(bot, args);
+          break;
+
         // Gathering commands
         case "mine":
           await this.gatherCommands.mine(bot, args);
@@ -58,6 +73,12 @@ export class CommandHandler {
         case "harvest":
           await this.gatherCommands.harvest(bot, args);
           break;
+
+        // Building commands
+        case "place":
+          await this.build.place(bot, args);
+          break;
+
 
         // Combat commands
         case "attack":
@@ -70,17 +91,6 @@ export class CommandHandler {
           await this.combatCommands.flee(bot, args);
           break;
 
-        // Exploration commands
-        case "explore":
-          await this.exploreCommands.explore(bot, args);
-          break;
-        case "scout":
-          await this.exploreCommands.scout(bot, args);
-          break;
-        case "map":
-          await this.exploreCommands.mapArea(bot, args);
-          break;
-
         // Utility commands
         case "status":
           await this.utilityCommands.showStatus(bot);
@@ -88,8 +98,20 @@ export class CommandHandler {
         case "inventory":
           await this.utilityCommands.showInventory(bot);
           break;
-        case "disable":
-          await this.utilityCommands.disable(bot, args);
+        case "equip":
+          await this.utilityCommands.equip(bot, args);
+          break;
+        case "drop":
+          await this.utilityCommands.drop(bot, args);
+          break;
+        case "interact":
+          await this.utilityCommands.interact(bot, args);
+          break;
+        case "store":
+          await this.utilityCommands.store(bot, args);
+          break;
+        case "feature":
+          await this.utilityCommands.feature(bot, args, this.featureList);
           break;
 
         // Help commands

@@ -25,6 +25,7 @@ export class Bot {
   private interactionManager: InteractionManager | null = null;
   private config: BotConfig;
   private isConnected = false;
+  static features: Set<{name: string, status: boolean}> = new Set();   // Features list status
 
   constructor(config: BotConfig) {
     this.config = config;
