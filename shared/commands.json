@@ -139,6 +139,14 @@
         "status": true,
         "intent_keywords": ["status", "info", "state", "condition", "health"]
       },
+      "chat": {
+        "syntax": "chat <message>",
+        "args": "<message>",
+        "description": "Send chat message",
+        "example": "chat Hello everyone!",
+        "status": true,
+        "intent_keywords": ["chat", "say", "speak", "message", "talk"]
+      },
       "inventory": {
         "syntax": "inventory",
         "args": "",

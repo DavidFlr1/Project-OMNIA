@@ -2,10 +2,11 @@ import mineflayer, { type Bot as MineflayerBot } from "mineflayer";
 import { pathfinder, Movements } from "mineflayer-pathfinder";
 import { plugin as collectBlock } from "mineflayer-collectblock";
 import { plugin as pvp } from "mineflayer-pvp";
-import { CommandHandler } from "./commands";
-import { Agent } from "./logic/agent";
-import { Memory } from "./logic/memory";
-import { InteractionManager } from "./logic/interaction";
+import { CommandHandler } from "./features";
+import { Agent } from "./core/agent";
+import { GoalManager } from "./core/goals";
+import { Memory } from "./core/memory";
+import { InteractionManager } from "./features/chatInteraction";
 import { logger } from "./utils";
 
 export interface BotConfig {
@@ -21,16 +22,18 @@ export class Bot {
   private bot: MineflayerBot | null = null;
   private commandHandler: CommandHandler;
   private agent: Agent;
+  private goalManager: GoalManager;
   private memory: Memory;
   private interactionManager: InteractionManager | null = null;
   private config: BotConfig;
   private isConnected = false;
-  static features: Set<{name: string, status: boolean}> = new Set();   // Features list status
+  static features: Set<{ name: string; status: boolean }> = new Set(); // Features list status
 
   constructor(config: BotConfig) {
     this.config = config;
     this.memory = new Memory();
-    this.agent = new Agent(this.memory);
+    this.goalManager = new GoalManager(this.memory);
+    this.agent = new Agent(this.memory, this.goalManager);
     this.commandHandler = new CommandHandler();
   }
 
@@ -230,6 +233,9 @@ export class Bot {
       position: this.bot.entity.position,
       dimension: this.bot.game.dimension,
       gameMode: this.bot.game.gameMode,
+      currentGoal: this.agent.getState().currentGoal,
+      featuresStatus: Array.from(this.getFeatures()),
+      inventory: this.bot.inventory.items(),
     };
 
     // Add interaction stats if available
@@ -243,8 +249,22 @@ export class Bot {
     return status;
   }
 
+  getFeatures(): Set<{ name: string; status: boolean }> {
+    return Bot.features;
+  }
+
+  getAgent(): Agent {
+    return this.agent;
+  }
+
+  getGoalManager(): GoalManager {
+    return this.goalManager;
+  }
+
   // Interaction management methods
   getInteractionManager(): InteractionManager | null {
     return this.interactionManager;
   }
 }
+
+

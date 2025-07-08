@@ -8,7 +8,11 @@
   "title": "Project OMNIA",
   "description": "Organized Minecraft Neural Intelligent Agents, a Minecraft Bot Civilization project",
   "private": true,
-  "workspaces": ["bot-agent", "bot-logic", "fastapi-bridge"],
+  "workspaces": [
+    "bot-agent",
+    "bot-logic",
+    "fastapi-bridge"
+  ],
   "scripts": {
     "dev:bot-agent": "cd bot-agent && npm run dev",
     "build:bot-agent": "cd bot-agent && npm run build",
@@ -24,9 +28,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/swagger-jsdoc": "^6.0.4",
     "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8"
   }
 }

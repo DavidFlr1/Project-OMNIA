@@ -201,3 +201,50 @@ export function isPlayerNearby(playerEntity: any, botEntity: any, maxDistance = 
   return botEntity.position.distanceTo(playerEntity.position) <= maxDistance
 }
 
+export function getNearbyPlayers(bot: any): string[] {
+  return Object.keys(bot.players).filter((name) => name !== bot.username);
+}
+
+export function getInventoryItems(bot: any): Record<string, number> {
+  const items: Record<string, number> = {};
+  bot.inventory.items().forEach((item: any) => {
+    items[item.name] = (items[item.name] || 0) + item.count;
+  });
+  return items;
+}
+
+export function getNearbyBots(bot: any, playerUsername: string): string[] {
+  const player = bot.players[playerUsername];
+  if (!player || !player.entity) return [];
+
+  const nearbyBots: string[] = [];
+  const playerPos = player.entity.position;
+
+  // Check all entities for other bots (players with "bot" in name or specific patterns)
+  Object.values(bot.entities).forEach((entity: any) => {
+    if (entity.type === "player" && entity.username && entity.username !== playerUsername) {
+      const distance = playerPos.distanceTo(entity.position);
+      if (distance <= 8) {
+        // Consider it a bot if it has "bot" in the name or matches bot naming patterns
+        const username = entity.username.toLowerCase();
+        if (username.includes("bot") || username.includes("_bot") || username.startsWith("bot")) {
+          nearbyBots.push(entity.username.toLowerCase());
+        }
+      }
+    }
+  });
+
+  return nearbyBots;
+}
+
+export function getCurrentActivity(bot: any, state: any): string {
+  // Simple activity detection based on bot state
+  if (bot.pathfinder && bot.pathfinder.isMoving()) {
+    return "moving";
+  }
+  if (state.isLookingAtPlayer) {
+    return "looking_at_player";
+  }
+  return "idle";
+}
+

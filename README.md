@@ -8,6 +8,11 @@ Project OMNIA (Organized Minecraft Neural Intelligent Agents) is a Minecraft Bot
 omnia/
 ├── bot-agent/               # Node.js/TypeScript Mineflayer bot implementation
 │   ├── src/                 # Bot agent source code
+│   │   ├── api/             # REST API server and routes
+│   │   ├── commands/        # Bot command implementations
+│   │   ├── core/            # Core bot functionality and state
+│   │   ├── test/            # Testing utilities including REPL
+│   │   └── utils/           # Helper functions and logging
 │   ├── Dockerfile           # Container definition
 │   └── package.json         # Dependencies and scripts
 ├── bot-logic/               # Python AI decision engine
@@ -139,20 +144,114 @@ bot> explore 50
 
 ### API Endpoints
 
-- Bot Agent: `http://localhost:3001`
-- Bot Logic: `http://localhost:8000`
-- FastAPI Bridge: `http://localhost:8001`
+The bot agent exposes a comprehensive REST API for controlling and monitoring the bot:
+
+- **Base URL**: `http://localhost:3001`
+- **Documentation**: `http://localhost:3001/api-docs` (Swagger UI)
+- **OpenAPI Spec**: `http://localhost:3001/api-spec` (for Postman import)
+
+#### Core Endpoints
+
+- `GET /health` - Health check
+- `GET /status` - Bot status
+- `POST /connect` - Connect to Minecraft server
+- `POST /disconnect` - Disconnect from server
+- `POST /command` - Execute bot command
+
+#### Chat Endpoints
+
+- `POST /chat` - Send chat message
+- `GET /chat/history` - Get chat history
+
+#### Goals Endpoints
+
+- `GET /goals` - List all goals
+- `POST /goals` - Create new goal
+- `GET /goals/:id` - Get goal details
+- `PUT /goals/:id` - Update goal
+- `DELETE /goals/:id` - Delete goal
+- `POST /goals/:id/activate` - Activate goal
+- `POST /goals/:id/complete` - Complete goal
+- `POST /goals/:id/milestones` - Add milestone to goal
 
 Example API request:
 ```bash
-curl -X POST http://localhost:3001/command -H "Content-Type: application/json" -d '{"command":"goto 100 64 200"}'
+curl -X POST http://localhost:3001/command \
+  -H "Content-Type: application/json" \
+  -d '{"command":"goto 100 64 200"}'
 ```
+
+## 🧠 Core Features
+
+### Bot Agent
+
+The bot agent is built on Mineflayer and provides:
+
+1. **Command System**
+   - Movement: `goto`, `follow`, `patrol`, `explore`
+   - Resource gathering: `mine`, `collect`, `harvest`
+   - Combat: `attack`, `defend`, `flee`
+   - Building: `place`, `build`
+   - Inventory: `craft`, `equip`, `drop`
+
+2. **Goal Management**
+   - Hierarchical goal system with milestones
+   - Priority-based execution
+   - Automatic command execution
+   - Progress tracking
+
+3. **Memory & State**
+   - Persistent memory with Redis
+   - Environment awareness
+   - Inventory tracking
+   - Entity recognition
+
+4. **API Integration**
+   - REST API for external control
+   - Event system for real-time updates
+   - OpenAPI documentation
+
+### Bot Logic
+
+The bot logic service provides:
+
+1. **Decision Making**
+   - Goal selection and planning
+   - Task prioritization
+   - Resource allocation
+
+2. **World Understanding**
+   - Environment mapping
+   - Resource tracking
+   - Risk assessment
+
+### FastAPI Bridge
+
+The FastAPI bridge provides:
+
+1. **LLM Integration**
+   - Natural language understanding
+   - Context-aware responses
+   - Decision support
+
+2. **RAG Capabilities**
+   - Knowledge retrieval
+   - Memory augmentation
+   - Learning from experience
 
 ## 🧪 Testing
 
 Test the LLM integration:
 ```bash
-curl -X POST http://localhost:8001/chat -H "Content-Type: application/json" -d @test-request.json
+curl -X POST http://localhost:8001/chat \
+  -H "Content-Type: application/json" \
+  -d @test-request.json
+```
+
+Test the bot agent API:
+```bash
+# Import the OpenAPI spec into Postman
+curl -X GET http://localhost:3001/api-spec > bot-api-spec.json
 ```
 
 ## 📝 Development
@@ -160,8 +259,32 @@ curl -X POST http://localhost:8001/chat -H "Content-Type: application/json" -d @
 For VSCode users, install the recommended Terminals extension for easy service management:
 - [Terminals](https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-terminals)
 
+### API Development
+
+The bot agent API uses Express with Swagger documentation:
+
+1. **Adding new endpoints**:
+   - Add route handlers in `bot-agent/src/api/routes/`
+   - Update OpenAPI spec in `bot-agent/src/api/openapi.ts`
+
+2. **Testing API**:
+   - Use Swagger UI at `http://localhost:3001/api-docs`
+   - Import OpenAPI spec to Postman from `http://localhost:3001/api-spec`
+
+### Bot Command Development
+
+To add new bot commands:
+
+1. Create command handler in `bot-agent/src/commands/`
+2. Register command in `bot-agent/src/commands/index.ts`
+3. Test using REPL: `npm run repl`
+
 ## 📚 Documentation
 
 For more detailed information:
 - [Bot Agent README](bot-agent/README.md)
   - Communication bridge between bots and AI models
+- [Minecraft Server README](minecraft-server/README.md)
+  - Server configuration and administration
+- [API Documentation](http://localhost:3001/api-docs)
+  - Interactive API documentation (when server is running)

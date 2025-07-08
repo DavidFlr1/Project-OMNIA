@@ -47,6 +47,18 @@ services:
     networks:
       - minecraft-network
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - minecraft-network
+
 networks:
   minecraft-network:
     driver: bridge
+
+volumes:
+  redis-data:

@@ -33,6 +33,16 @@
       "recycle": true
     },
     {
+      "name": "memory-redis",
+      "description": "Terminal to execute the redis server",
+      "commands": [
+        "docker run --name redis-memory -p 6379:6379 -d redis"
+      ],
+      "color": "terminal.ansiRed",
+      "icon": "database",
+      "recycle": true
+    },
+    {
       "name": "bot-logic",
       "description": "Terminal to execute the bot-logic",
       "commands": [
