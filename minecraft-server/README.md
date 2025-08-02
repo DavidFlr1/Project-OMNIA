@@ -1,14 +1,15 @@
 # Minecraft Server Project
 
-A containerized Minecraft server using PaperMC 1.21, configured for both local Docker development and Kubernetes deployment.
+A containerized Minecraft server using PaperMC 1.21, configured for local Docker development and integrated with the OMNIA bot civilization project.
 
 ## Project Overview
 
 This project provides a ready-to-use Minecraft server with:
 - PaperMC 1.21 (Java Edition)
-- Custom server properties and configurations
-- Docker and Kubernetes deployment options
-- Automated world backups
+- Custom server properties optimized for bot interactions
+- Docker deployment
+- Plugin support for enhanced gameplay
+- Offline mode for bot connections
 
 ## Folder Structure
 
@@ -19,14 +20,16 @@ minecraft-server/
 ├── eula.txt              # Minecraft EULA acceptance
 ├── server.properties     # Server configuration
 ├── plugins/              # Server plugins
-│   └── PeacefulButHarsh.jar  # Custom gameplay modifications
+│   ├── SkinsRestorer.jar # Player skin management
+│   ├── ImageMaps-1.0.jar # Custom map support
+│   ├── InfoHUD-1.5.4.jar # HUD information display
+│   └── blockprot-spigot-1.2.5-all.jar # Block protection
 ├── scripts/
 │   ├── entrypoint.sh     # Container startup script
 │   └── backup.sh         # World backup utility
-├── k8s/                  # Kubernetes deployment files
-│   ├── minecraft-deployment.yaml
-│   └── world-backup-cronjob.yaml
-└── world/                # Persistent world data
+├── world/                # Persistent world data
+└── misc/                 # Additional server utilities
+    └── signs.txt         # Command examples for in-game signs
 ```
 
 ## Server Specifications
@@ -34,7 +37,8 @@ minecraft-server/
 - Java 21 runtime
 - 4GB memory allocation
 - Port: 25565 (default Minecraft port)
-- Peaceful gameplay (no hostile mobs) with normal difficulty
+- Normal difficulty with hostile mobs disabled
+- Offline mode enabled for bot connections
 - Persistent world storage
 
 ## Getting Started
@@ -76,6 +80,8 @@ Connect using Minecraft Java Edition:
 2. Select "Multiplayer"
 3. Add Server with address: `localhost:25565`
 
+Note: The server runs in offline mode to support bot connections from the OMNIA project.
+
 ## Server Administration
 
 ### Access Server Console
@@ -96,7 +102,6 @@ Method 2: Edit `world/ops.json` file and restart the server
 ```json
 [
   {
-    // for offline mode check the log uuid generated to add it into the ops.json
     "uuid": "player-uuid-here", 
     "name": "playerName",
     "level": 4,
@@ -111,17 +116,28 @@ Permission levels:
 - Level 3: Admin (server control)
 - Level 4: Owner (complete access)
 
-## Kubernetes Deployment
+## Installed Plugins
 
-For production deployment, use the Kubernetes manifests in the `k8s/` directory.
+- **SkinsRestorer**: Manages player skins in offline mode
+- **ImageMaps**: Enables custom map displays
+- **InfoHUD**: Provides HUD information to players
+- **BlockProt**: Protects blocks from unauthorized modification
 
-```bash
-kubectl apply -f k8s/
-```
+## Integration with OMNIA
 
-## Backups
+This server is designed to work with the OMNIA bot civilization project:
+- Offline mode allows bots to connect without Mojang authentication
+- Peaceful settings (no hostile mobs) create a safe environment for bot learning
+- Custom plugins enhance the bot interaction experience
 
-Automated hourly backups are configured in Kubernetes using a CronJob that saves world data to Google Cloud Storage.
+## Configuration Notes
 
-### Recommended settings
-- Enable F3 + H in game to get block id's
+- `online-mode=false`: Enables bot connections
+- `spawn-monsters=false`: Disables hostile mobs for peaceful gameplay
+- `spawn-animals=true`: Keeps passive mobs for interaction
+- `enable-command-block=true`: Allows advanced automation
+
+## Recommended Settings
+
+- Enable F3 + H in-game to see block IDs for bot development
+- Use the commands in `misc/signs.txt` to create training areas for bots

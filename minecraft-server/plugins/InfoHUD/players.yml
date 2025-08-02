@@ -1,0 +1,6 @@
+infohudVersion: 1.5.4
+playerConfig:
+  b94f12d9-b4aa-3ca9-a598-9f47f2d1fd14:
+    coordinatesMode: enabled
+    timeMode: clock24
+    darkMode: auto

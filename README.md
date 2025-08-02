@@ -34,12 +34,12 @@ omnia/
 
 ## 🛠️ Technologies
 
-- **Bot Agent**: Node.js, TypeScript, Mineflayer
-- **Bot Logic**: Python, FastAPI, AI planning algorithms
-- **FastAPI Bridge**: Python, FastAPI, LLM integration
+- **Bot**:
+   - **Agent**: Node.js, TypeScript, Mineflayer
+   - **Logic**: Python, FastAPI, AI planning algorithms
+- **Governor**: Python, FastAPI, LLM integration
 - **Minecraft Server**: PaperMC 1.21, Docker
-- **Infrastructure**: Docker, Redis, Kubernetes (optional)
-- **AI**: LLM integration, RAG (Retrieval Augmented Generation)
+- **Storage Service**: Python, FastAPI, Redis, Firestore, Cloud Storage
 
 ## 🚀 Getting Started
 
