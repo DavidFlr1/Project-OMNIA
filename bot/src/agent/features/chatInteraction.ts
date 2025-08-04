@@ -86,6 +86,7 @@ export class InteractionManager {
       isLooking,
       timestamp: Date.now(),
     });
+    await this.memory.createEvent("player_interaction", { username: "Steve" }, 5);
   }
 
   // Public method to check if command should be processed
@@ -164,6 +165,7 @@ export class InteractionManager {
         response,
         timestamp: now,
       });
+      //* await this.memory.createEvent("player_joined", { username: "Steve" }, 5);
     }
   }
 

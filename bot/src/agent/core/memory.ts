@@ -2,7 +2,7 @@ import { createClient, RedisClientType } from "redis";
 import { logger } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 
-export type Tables = 'event' | 'discovery' | 'chat' | 'command' | 'goals' | 'agent' | 'memory' | 'world';
+export type Tables = 'event' | 'discovery' | 'chat' | 'command' | 'goals' | 'agent' | 'world';
 export interface MemoryEntry {
   id?: string;
   type: string;
@@ -41,7 +41,6 @@ export class Memory {
   public commandMemory: MemoryEntry[] = [];
   public goalsMemory: MemoryEntry[] = [];
   public agentMemory: MemoryEntry = { id: 'agent', type: 'agent', data: {}, timestamp: Date.now() };
-  public memoryMemory: MemoryEntry[] = [];
   public worldMemory: MemoryEntry[] = [];
 
   private chatHistory: ChatMessage[] = [];
@@ -49,28 +48,29 @@ export class Memory {
   private commandHistory: Command[] = [];
   private agentState: any = {};
   
-  // Lists for time-series data
+  //! Lists for time-series data
   private listTables: Tables[] = ['event', 'discovery', 'chat', 'command', 'world'];
   
-  // Key-value for objects with IDs
-  private objectTables: Tables[] = ['goals', 'memory'];
+  //! Key-value for objects with IDs
+  private objectTables: Tables[] = ['goals'];
   
-  // Singleton objects
+  //! Singleton objects
   private singletonTables: Tables[] = ['agent'];
 
   constructor() {
-    this.initializeRedis();
-    this.tables = [
+    this.initializeRedis(); //!
+    this.tables = [ //!
       'event',
       'discovery',
       'chat',
       'command',
       'goals',
       'agent',
-      'memory',
       'world',
     ]
   }
+
+  //! DEPRECATED START
 
   private async initializeRedis(): Promise<void> {
     try {
@@ -503,7 +503,84 @@ export class Memory {
       await this.redisClient.quit();
     }
   }
+
+//! DEPRECATED END
+
+  // Event Service Integration
+  async createEvent(eventType: string, data: any, severity: number = 0): Promise<string | null> {
+    try {
+      const botId = this.agentState.username || this.agentState.subPort || 'unknown';
+      
+      const response = await fetch(`${process.env.STORAGE_SERVICE_URL}/events/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_type: eventType,
+          data: data,
+          bot_id: botId,
+          severity: severity
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      logger.info(`Event created via storage service: ${eventType} (${result.event_id})`);
+      return result.event_id;
+      
+    } catch (error) {
+      logger.error(`Failed to create event via storage service: ${error}`);
+      // Fallback to local storage
+      this.addEvent(eventType, data);
+      return null;
+    }
+  }
+
+  async getEvents(count: number = 10, filters?: {
+    eventId?: string;
+    botId?: string;
+    eventType?: string;
+    minSeverity?: number;
+  }): Promise<any[]> {
+    try {
+      const params = new URLSearchParams({
+        count: count.toString(),
+        ...(filters?.eventId && { event_id: filters.eventId }),
+        ...(filters?.botId && { bot_id: filters.botId }),
+        ...(filters?.eventType && { event_type: filters.eventType }),
+        ...(filters?.minSeverity !== undefined && { min_severity: filters.minSeverity.toString() })
+      });
+
+      const response = await fetch(`${process.env.STORAGE_SERVICE_URL}/events/?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      // Update local eventMemory for quick access
+      this.eventMemory = result.events.map((event: any) => ({
+        id: event.id,
+        type: event.type,
+        data: event.data,
+        timestamp: event.timestamp
+      }));
+      
+      return result.events;
+      
+    } catch (error) {
+      logger.error(`Failed to get events via storage service: ${error}`);
+      // Fallback to local storage
+      return this.eventMemory.slice(-count);
+    }
+  }
 }
+
 
 
 

@@ -9,6 +9,11 @@ import textwrap
 from typing import Optional
 from dotenv import load_dotenv
 
+# from logic.context import getLocalEvents
+# recent = getLocalEvents(10)
+# from logic.memory import get_events
+# events = await get_events(20, event_type="player_joined")
+
 # Load environment variables
 load_dotenv()
 

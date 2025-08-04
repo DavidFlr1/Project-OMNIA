@@ -35,13 +35,30 @@
     },
     {
       "name": "Storage",
-      "description": "Terminal to execute the redis server",
+      "description": "Terminal to execute the storage server",
       "commands": [
         "cd storage-service",
-        "docker build -t storage-service . && docker run -p 8000:8000 storage-service"
+        "python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"
       ],
       "color": "terminal.ansiRed",
       "icon": "database",
+      "recycle": true,
+      "_comments": {
+        "Build and run": "docker build -t storage-service . ; docker run --name storage-service -p 8000:8000 storage-service",
+        "For production": "docker stop storage-service 2>$null; docker rm storage-service 2>$null; docker build -t storage-service .; docker run --name storage-service -p 8000:8000 storage-service"
+      }
+    },
+    {
+      "name": "redis",
+      "split": "Storage",
+      "description": "Terminal to execute the redis server",
+      "commands": [
+        "docker run --name redis-memory -p 6379:6379 -d redis",
+        "docker start redis-memory",
+        "docker logs -f redis-memory"
+      ],
+      "color": "terminal.ansiMagenta",
+      "icon": "debug-breakpoint-conditional-unverified",
       "recycle": true
     },
     {
@@ -58,12 +75,12 @@
 
     {
       "name": "bot-1",
-      "description": "Terminal to execute a bot",
+      "description": "Terminal to execute a bot agent",
       "commands": [
         "cd bot",
         "npm run dev:agent botName=Bob subPort=1"
       ],
-      "color": "terminal.ansiWhite",
+      "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
       "recycle": true
@@ -71,26 +88,28 @@
     {
       "name": "bot-logic-1",
       "split": "bot-1",
-      "description": "Terminal to execute the bot-logic",
+      "description": "Terminal to execute the bot logic",
       "commands": [
         "cd bot",
         "npm run dev:logic subPort=1"
       ],
-      "color": "terminal.ansiMagenta",
-      "icon": "debug-breakpoint-log-unverified",
+      "color": "terminal.ansiGreen",
+      "icon": "robot",
       "execute": false,
       "recycle": true,
-      "_comment": "python -m uvicorn main:app --host 0.0.0.0 --port 4001"
+      "_comments": {
+        "to run using python":"python -m uvicorn main:app --host 0.0.0.0 --port 4001"
+      }
     },
 
     {
       "name": "bot-2",
-      "description": "Terminal to execute a bot",
+      "description": "Terminal to execute a bot agent",
       "commands": [
         "cd bot",
         "npm run dev:agent botName=Tod subPort=2"
       ],
-      "color": "terminal.ansiWhite",
+      "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
       "recycle": true
@@ -98,13 +117,13 @@
     {
       "name": "bot-logic-2",
       "split": "bot-2",
-      "description": "Terminal to execute the bot-logic",
+      "description": "Terminal to execute the bot logic",
       "commands": [
         "cd bot",
         "npm run dev:logic subPort=2"
       ],
-      "color": "terminal.ansiMagenta",
-      "icon": "debug-breakpoint-log-unverified",
+      "color": "terminal.ansiGreen",
+      "icon": "robot",
       "execute": false,
       "recycle": true
     }

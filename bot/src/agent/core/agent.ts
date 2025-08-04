@@ -15,9 +15,12 @@ export interface AgentState {
   position?: { x: number; y: number; z: number };
   dimension?: string;
   gameMode?: string;
+
+  goalListId?: string;
   currentGoal?: string | null;
   featureList?: Array<Feature>;
-  interactions?: any;
+
+  memories?: any; // interactions, important events, things of interest, evolution
   inventory?: Item[];
 }
 

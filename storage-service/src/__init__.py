@@ -4,10 +4,11 @@ Storage Service - Central storage management for the bot ecosystem
 
 import os
 import logging
+import asyncio
 from typing import Optional
 from dotenv import load_dotenv
 
-from redis import Redis
+import redis.asyncio as aioredis
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +21,7 @@ class DatabaseConnections:
     """Centralized database connection management"""
     
     def __init__(self):
-        self.redis: Optional[Redis] = None
+        self.redis: Optional[aioredis.Redis] = None
         self.firestore = None  # TODO: Add Firestore client
         self.cloud_storage = None  # TODO: Add Cloud Storage client
         
@@ -36,7 +37,9 @@ class DatabaseConnections:
             redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
             redis_password = os.getenv('REDIS_PASSWORD')
             
-            self.redis = Redis.from_url(
+            logger.info(f"🔄 Attempting Redis connection to: {redis_url}")
+            
+            self.redis = aioredis.from_url(
                 redis_url,
                 password=redis_password,
                 decode_responses=True
@@ -44,7 +47,7 @@ class DatabaseConnections:
             
             # Test connection
             await self.redis.ping()
-            logger.info("✅ Redis connection established")
+            logger.info(f"✅ Redis connection established: {redis_url}")
             
         except Exception as e:
             logger.error(f"❌ Redis connection failed: {e}")
@@ -58,3 +61,6 @@ class DatabaseConnections:
 
 # Global database connections instance
 db_connections = DatabaseConnections()
+
+
+
