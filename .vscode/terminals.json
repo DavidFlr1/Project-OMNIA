@@ -21,25 +21,19 @@
       "execute": false,
       "recycle": true
     },
-    
+
     {
       "name": "Server",
       "description": "Terminal to execute the server",
       "color": "terminal.ansiCyan",
       "icon": "server-environment",
-      "commands": [
-        "cd minecraft-server",
-        "docker compose up --build"
-      ],
+      "commands": ["cd minecraft-server", "docker compose up --build"],
       "recycle": true
     },
     {
       "name": "Storage",
       "description": "Terminal to execute the storage server",
-      "commands": [
-        "cd storage-service",
-        "python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"
-      ],
+      "commands": ["cd storage-service", "python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"],
       "color": "terminal.ansiRed",
       "icon": "database",
       "recycle": true,
@@ -64,10 +58,7 @@
     {
       "name": "Governor",
       "description": "Terminal to execute the Governor",
-      "commands": [
-        "cd governor",
-        "python -m uvicorn app.main:app --host 0.0.0.0 --port 5000"
-      ],
+      "commands": ["cd governor", "python -m uvicorn app.main:app --host 0.0.0.0 --port 5000"],
       "color": "terminal.ansiBlack",
       "icon": "type-hierarchy",
       "recycle": true
@@ -76,10 +67,7 @@
     {
       "name": "bot-1",
       "description": "Terminal to execute a bot agent",
-      "commands": [
-        "cd bot",
-        "npm run dev:agent botName=Bob subPort=1"
-      ],
+      "commands": ["cd bot", "npm run dev:agent botName=Bob subPort=1"],
       "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
@@ -89,26 +77,20 @@
       "name": "bot-logic-1",
       "split": "bot-1",
       "description": "Terminal to execute the bot logic",
-      "commands": [
-        "cd bot",
-        "npm run dev:logic subPort=1"
-      ],
+      "commands": ["cd bot", "npm run dev:logic subPort=1"],
       "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
       "recycle": true,
       "_comments": {
-        "to run using python":"python -m uvicorn main:app --host 0.0.0.0 --port 4001"
+        "to run using python": "python -m uvicorn main:app --host 0.0.0.0 --port 4001"
       }
     },
 
     {
       "name": "bot-2",
       "description": "Terminal to execute a bot agent",
-      "commands": [
-        "cd bot",
-        "npm run dev:agent botName=Tod subPort=2"
-      ],
+      "commands": ["cd bot", "npm run dev:agent botName=Tod subPort=2"],
       "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
@@ -118,10 +100,7 @@
       "name": "bot-logic-2",
       "split": "bot-2",
       "description": "Terminal to execute the bot logic",
-      "commands": [
-        "cd bot",
-        "npm run dev:logic subPort=2"
-      ],
+      "commands": ["cd bot", "npm run dev:logic subPort=2"],
       "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,

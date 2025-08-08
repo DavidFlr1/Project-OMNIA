@@ -8,7 +8,7 @@ import { ExploreCommands } from "./explore";
 import { UtilityCommands } from "./utility";
 import { logger } from "../utils";
 import { getHelp } from "../utils";
-import { Feature } from "../types";
+import { Feature } from "../../types";
 
 export class CommandHandler {
   private moveCommands: MoveCommands;
@@ -35,10 +35,10 @@ export class CommandHandler {
       switch (action.toLowerCase()) {
         // Movement commands
         case "goto":
-          await this.moveCommands.goto(bot, args);
+          await this.moveCommands.goto(bot, args, memory);
           break;
         case "follow":
-          await this.moveCommands.follow(bot, args);
+          await this.moveCommands.follow(bot, args, memory);
           break;
         case "reach":
           await this.moveCommands.reach(bot, args);
@@ -125,7 +125,7 @@ export class CommandHandler {
       }
 
       // Store command in memory
-      memory.addCommand(command);
+      // memory.addCommand(command);
     } catch (error) {
       logger.error(`Error executing command ${action}:`, error);
       bot.chat(`Error executing command: ${error instanceof Error ? error.message : "Unknown error"}`);

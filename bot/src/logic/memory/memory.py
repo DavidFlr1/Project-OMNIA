@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 STORAGE_SERVICE_URL = os.getenv("STORAGE_SERVICE_URL", "http://localhost:8000/api/v1/events") #
 
 async def create_event(event_type: str, data: Dict[str, Any], 
-                      bot_id: Optional[str] = None, severity: int = 0) -> Optional[str]:
+                      botId: Optional[str] = None, severity: int = 0) -> Optional[str]:
     """
     Create an event via storage service
     
     Args:
         event_type: Type of event
         data: Event data
-        bot_id: Bot identifier
+        botId: Bot identifier
         severity: Event severity (0-10)
         
     Returns:
@@ -34,7 +34,7 @@ async def create_event(event_type: str, data: Dict[str, Any],
         payload = {
             "event_type": event_type,
             "data": data,
-            "bot_id": bot_id,
+            "botId": botId,
             "severity": severity
         }
         
@@ -58,7 +58,7 @@ async def get_events(count: int = 10, **filters) -> List[Dict[str, Any]]:
     
     Args:
         count: Number of events to retrieve
-        **filters: Additional filters (event_id, bot_id, event_type, min_severity)
+        **filters: Additional filters (event_id, botId, event_type, min_severity)
         
     Returns:
         List of events

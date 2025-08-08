@@ -4,7 +4,6 @@ import swaggerJsdoc from "swagger-jsdoc";
 import type { Bot } from "../bot";
 import { createCoreRouter } from "./routes/core";
 import { createChatRouter } from "./routes/chat";
-import { createGoalsRouter } from "./routes/goals";
 import { options as swaggerOptions } from "./openapi";
 import { logger } from "../utils";
 import { createBotRouter } from "./routes/bot";
@@ -30,7 +29,6 @@ export async function startApiServer(bot: Bot, port: number): Promise<void> {
   app.use("/", createCoreRouter(bot));
   app.use("/bot", createBotRouter(bot));
   app.use("/chat", createChatRouter(bot));
-  app.use("/goals", createGoalsRouter(bot));
 
   // Error handling middleware
   app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -45,9 +43,3 @@ export async function startApiServer(bot: Bot, port: number): Promise<void> {
     logger.info(`API spec for Postman available at http://localhost:${port}/api-spec`);
   });
 }
-
-
-
-
-
-

@@ -78,15 +78,13 @@ export class InteractionManager {
     }
 
     // Store interaction in memory
-    this.memory.addEvent("player_interaction", {
+    this.memory.createEvent("chat_message", {
       username,
       message,
       distance,
       isNearby,
       isLooking,
-      timestamp: Date.now(),
     });
-    await this.memory.createEvent("player_interaction", { username: "Steve" }, 5);
   }
 
   // Public method to check if command should be processed
@@ -159,11 +157,11 @@ export class InteractionManager {
       logger.info(`Responded to ${username}: "${response}"`);
 
       // Store response in memory
-      this.memory.addEvent("bot_response", {
+      this.memory.createEvent("chat_message", {
+        event: 'bot_response',
         username,
-        originalMessage: message,
+        message,
         response,
-        timestamp: now,
       });
       //* await this.memory.createEvent("player_joined", { username: "Steve" }, 5);
     }
@@ -186,7 +184,7 @@ export class InteractionManager {
         inventory: getInventoryItems(this.bot),
         nearbyPlayers: getNearbyPlayers(this.bot),
         currentActivity: getCurrentActivity(this.bot, this.state),
-        memory: this.memory.getRecentChat(5),
+        // memory: this.memory.getRecentChat(5),
       };
 
       const response = await fetch(`${botLogicUrl}/chat`, {
@@ -300,12 +298,12 @@ export class InteractionManager {
 
   // Stats
   public getInteractionStats(): any {
-    const recentInteractions = this.memory.searchEventHistory("player_interaction");
-    const recentResponses = this.memory.searchEventHistory("bot_response");
+    // const recentInteractions = this.memory.searchEventHistory("player_interaction");
+    // const recentResponses = this.memory.searchEventHistory("bot_response");
 
     return {
-      totalInteractions: recentInteractions.length,
-      totalResponses: recentResponses.length,
+      // totalInteractions: recentInteractions.length,
+      // totalResponses: recentResponses.length,
       currentTarget: this.state.currentTarget,
       isLookingAtPlayer: this.state.isLookingAtPlayer,
       lastInteraction: this.state.lastInteraction,

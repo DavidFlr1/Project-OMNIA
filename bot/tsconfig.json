@@ -26,6 +26,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*", "tests/test-commands.ts"],
+  "include": ["src/**/*", "tests/test-commands.ts", "_deprecated/goals-core.ts", "_deprecated/goals-api.ts"],
   "exclude": ["node_modules", "dist", "tests"]
 }

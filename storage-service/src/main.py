@@ -32,3 +32,4 @@ async def health_check():
         "service": "storage-service",
         "redis_connected": db_connections.redis is not None
     }
+

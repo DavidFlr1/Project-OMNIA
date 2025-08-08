@@ -8,7 +8,7 @@ import { GoalManager } from "./core/goals";
 import { Memory } from "./core/memory";
 import { InteractionManager } from "./features/chatInteraction";
 import { logger } from "./utils";
-import { Feature } from "./types";
+import { Feature } from "../types";
 
 export interface BotConfig {
   host: string;
@@ -22,10 +22,10 @@ export interface BotConfig {
 
 export class Bot {
   public bot: MineflayerBot | null = null;
-  public agent: Agent;
+  public agent: Agent | null = null;
   private config: BotConfig;
   public memory: Memory;
-  private goalManager: GoalManager;
+  private goalManager: GoalManager | null = null;
   private commandHandler: CommandHandler;
   public interactionManager: InteractionManager | null = null;
   public featureManager: Set<Feature>; // Features list status
@@ -34,10 +34,10 @@ export class Bot {
   constructor(config: BotConfig) {
     this.config = config;
     this.memory = new Memory();
-    this.goalManager = new GoalManager(this.memory);
+    this.goalManager;
     this.featureManager = new Set();
     this.commandHandler = new CommandHandler();
-    this.agent = new Agent(this.memory, this.goalManager, this);
+    this.agent;
   }
 
   async connect(): Promise<void> {
@@ -57,6 +57,7 @@ export class Bot {
       this.bot.loadPlugin(collectBlock);
       this.bot.loadPlugin(pvp);
 
+      
       // Set up event handlers
       this.setupEventHandlers();
 
@@ -91,6 +92,13 @@ export class Bot {
         logger.info("Interaction manager initialized");
       }
 
+      // Initialize goal manager
+      this.goalManager = new GoalManager(this.memory);
+      
+      // Initialize the agent after bot is connected
+      this.agent = new Agent(this.bot, this.memory, this.goalManager, this.interactionManager, this.featureManager);
+      this.agent.updateStatus({});
+
       logger.info("Bot connected and ready");
     } catch (error) {
       logger.error("Failed to connect bot:", error);
@@ -105,7 +113,7 @@ export class Bot {
       if (username === this.bot!.username) return;
 
       logger.info(`Chat: <${username}> ${message}`);
-      this.memory.addChatMessage(username, message);
+      // this.memory.addChatMessage(username, message);
 
       // Process commands from chat (only if they start with ! and are targeted at this bot)
       if (message.startsWith("!")) {
@@ -122,15 +130,23 @@ export class Bot {
       }
       // Note: Interaction manager handles regular chat for conversations
     });
+    
+    // System events per thick
+    // this.bot.on("physicsTick", () => {
+    //   // Update status every 3 seconds
+    //   if (Date.now() - this.agent?.getStatus()?.timestamp > 3000) {
+    //     this.agent?.updateStatus({}, false);
+    //   }
+    // });
 
     this.bot.on("playerJoined", (player) => {
       logger.info(`Player joined: ${player.username}`);
-      this.memory.addEvent("player_joined", { username: player.username });
+      this.memory.createEvent("system_event", { event: 'player_joined', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
     });
 
     this.bot.on("playerLeft", (player) => {
       logger.info(`Player left: ${player.username}`);
-      this.memory.addEvent("player_left", { username: player.username });
+      this.memory.createEvent("system_event", { event: 'player_left', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
 
       // Stop looking at player if they left
       if (this.interactionManager) {
@@ -150,7 +166,7 @@ export class Bot {
 
     this.bot.on("death", () => {
       logger.warn("Bot died");
-      this.memory.addEvent("death", { timestamp: Date.now() });
+      this.memory.createEvent("system_event", { event: 'death', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
     });
 
     this.bot.on("kicked", (reason) => {
@@ -218,10 +234,13 @@ export class Bot {
     return this.bot;
   }
 
-  getAgent(): Agent {
+  getAgent(): Agent | null {
     return this.agent;
   }
 }
+
+
+
 
 
 

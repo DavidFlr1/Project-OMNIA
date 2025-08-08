@@ -1,5 +1,6 @@
-import type { Bot as MineflayerBot } from "mineflayer";
 import { goals } from "mineflayer-pathfinder";
+import type { Bot as MineflayerBot } from "mineflayer";
+import type { Memory } from "../core/memory";
 import { logger } from "../utils";
 
 export class MoveCommands {
@@ -8,9 +9,14 @@ export class MoveCommands {
   private currentPatrolIndex = 0;
   private _followInterval: NodeJS.Timeout | null = null;
 
-  async goto(bot: MineflayerBot, args: string[]): Promise<void> {
+  async goto(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 3) {
       bot.chat("Usage: goto <x> <y> <z>");
+      memory.createEvent("command_executed", {
+        command: `goto ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: goto <x> <y> <z>`",
+      });
       return;
     }
 
@@ -25,22 +31,35 @@ export class MoveCommands {
 
     try {
       logger.info(`Moving to position: (${x}, ${y}, ${z})`);
-      bot.chat(`Moving to (${x}, ${y}, ${z})`);
+      memory.createEvent("command_executed", { command: `goto ${x} ${y} ${z}`, status: "in_progress" });
 
       const goal = new goals.GoalBlock(x, y, z);
       await bot.pathfinder.goto(goal);
 
-      bot.chat("Arrived at destination");
+      memory.createEvent("command_executed", {
+        command: `goto ${x} ${y} ${z}`,
+        status: "completed",
+        message: "Arrived at destination",
+      });
       logger.info("Successfully reached destination");
     } catch (error) {
       logger.error("Having trouble reaching destination:", error);
-      bot.chat("Having trouble reaching destination");
+      memory.createEvent("command_executed", {
+        command: `goto ${x} ${y} ${z}`,
+        status: "failed",
+        message: `Having trouble reaching destination, error: ${error}`,
+      });
     }
   }
 
-  async follow(bot: MineflayerBot, args: string[]): Promise<void> {
+  async follow(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 1) {
       bot.chat("Usage: follow <player>");
+      memory.createEvent("command_executed", {
+        command: `follow ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: follow <player>`",
+      });
       return;
     }
 
@@ -48,12 +67,17 @@ export class MoveCommands {
     const target = bot.players[playerName];
 
     if (!target || !target.entity) {
-      bot.chat(`Player ${playerName} not found`);
+      memory.createEvent("command_executed", {
+        command: `follow ${playerName}`,
+        status: "failed",
+        message: `Player ${playerName} not found`,
+      });
       return;
     }
 
     try {
       logger.info(`Following player: ${playerName}`);
+      memory.createEvent("command_executed", { command: `follow ${playerName}`, status: "in_progress" });
       bot.chat(`Following ${playerName}`);
 
       // Set up continuous following
@@ -63,7 +87,11 @@ export class MoveCommands {
         if (!player || !player.entity) {
           clearInterval(followInterval);
           logger.info(`Player ${playerName} no longer found, stopping follow`);
-          bot.chat(`Player ${playerName} lost, stopping follow`);
+          memory.createEvent("command_executed", {
+            command: `follow ${playerName}`,
+            status: "interrupted",
+            message: `Player ${playerName} lost, stopping follow`,
+          });
           return;
         }
 
@@ -76,13 +104,22 @@ export class MoveCommands {
       this._followInterval = followInterval;
     } catch (error) {
       logger.error("Failed to follow player:", error);
-      bot.chat("Failed to follow player");
+      memory.createEvent("command_executed", {
+        command: `follow ${playerName}`,
+        status: "failed",
+        message: `Failed to follow player, error: ${error}`,
+      });
     }
   }
 
-  async reach(bot: MineflayerBot, args: string[]): Promise<void> {
+  async reach(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 1) {
-      bot.chat("Usage: follow <player>");
+      bot.chat("Usage: reach <player>");
+      memory.createEvent("command_executed", {
+        command: `reach ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: reach <player>`",
+      });
       return;
     }
 
@@ -90,25 +127,38 @@ export class MoveCommands {
     const target = bot.players[playerName];
 
     if (!target || !target.entity) {
-      bot.chat(`Player ${playerName} not found`);
+      memory.createEvent("command_executed", {
+        command: `reach ${playerName}`,
+        status: "failed",
+        message: `Player ${playerName} not found`,
+      });
       return;
     }
 
     try {
-      logger.info(`Following player: ${playerName}`);
-      bot.chat(`Following ${playerName}`);
+      logger.info(`Reaching player: ${playerName}`);
+      memory.createEvent("command_executed", { command: `reach ${playerName}`, status: "in_progress" });
 
       const goal = new goals.GoalFollow(target.entity, 2);
       await bot.pathfinder.goto(goal);
     } catch (error) {
-      logger.error("Failed to follow player:", error);
-      bot.chat("Failed to follow player");
+      logger.error("Failed to reach player:", error);
+      memory.createEvent("command_executed", {
+        command: `reach ${playerName}`,
+        status: "failed",
+        message: `Failed to reach player, error: ${error}`,
+      });
     }
   }
 
-  async patrol(bot: MineflayerBot, args: string[]): Promise<void> {
+  async patrol(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 4) {
       bot.chat("Usage: patrol <x1> <z1> <x2> <z2>");
+      memory.createEvent("command_executed", {
+        command: `patrol ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: patrol <x1> <z1> <x2> <z2>`",
+      });
       return;
     }
 
@@ -118,7 +168,11 @@ export class MoveCommands {
     const z2 = Number.parseFloat(args[3]);
 
     if (isNaN(x1) || isNaN(z1) || isNaN(x2) || isNaN(z2)) {
-      bot.chat("Invalid coordinates. Please provide numbers.");
+      memory.createEvent("command_executed", {
+        command: `patrol ${args.join(" ")}`,
+        status: "failed",
+        message: "Invalid coordinates. Please provide numbers.",
+      });
       return;
     }
 
@@ -130,12 +184,8 @@ export class MoveCommands {
     this.isPatrolling = true;
 
     logger.info(`Starting patrol between (${x1}, ${z1}) and (${x2}, ${z2})`);
-    bot.chat("Starting patrol");
+    memory.createEvent("command_executed", { command: `patrol ${args.join(" ")}`, status: "in_progress" });
 
-    this.executePatrol(bot);
-  }
-
-  private async executePatrol(bot: MineflayerBot): Promise<void> {
     while (this.isPatrolling && this.patrolPoints.length > 0) {
       const point = this.patrolPoints[this.currentPatrolIndex];
 
@@ -150,21 +200,26 @@ export class MoveCommands {
         this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
       } catch (error) {
         logger.error("Patrol error:", error);
+        memory.createEvent("command_executed", {
+          command: `patrol ${args.join(" ")}`,
+          status: "failed",
+          message: `Patrol error: ${error}`,
+        });
         break;
       }
     }
   }
 
-  async stay(bot: MineflayerBot): Promise<void> {
+  async stay(bot: MineflayerBot, memory: Memory): Promise<void> {
     // Clear any active follow interval
     if (this._followInterval) {
       clearInterval(this._followInterval);
       this._followInterval = null;
     }
-    
+
     this.isPatrolling = false;
     bot.pathfinder.stop();
-    bot.chat("Movement stopped");
+    memory.createEvent("command_executed", { command: `stay`, status: "completed", message: "Movement stopped" });
     logger.info("Movement stopped");
   }
 }

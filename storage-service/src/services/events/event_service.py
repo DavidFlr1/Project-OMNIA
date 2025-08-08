@@ -21,14 +21,14 @@ class EventService:
         self.db = db_connections
         
     async def createEvent(self, event_type: str, data: Dict[str, Any], 
-                         bot_id: Optional[str] = None, severity: int = 0) -> str:
+                         botId: Optional[str] = None, severity: int = 0) -> str:
         """
         Create a new event and store it in Redis
         
         Args:
             event_type: Type of event (e.g., 'player_joined', 'goal_completed')
             data: Event data payload
-            bot_id: Optional bot identifier
+            botId: Optional bot identifier
             severity: Event severity/importance (default 0)
             
         Returns:
@@ -39,7 +39,7 @@ class EventService:
         
         event = {
             'id': event_id,
-            'bot_id': bot_id,
+            'botId': botId,
             'type': event_type,
             'data': data,
             'severity': severity,
@@ -52,10 +52,10 @@ class EventService:
                 raise Exception("Redis connection not available")
                 
             # Store in Redis list (matches bot memory format)
-            await self.db.redis.lpush("event", json.dumps(event))
+            await self.db.redis.lpush("events", json.dumps(event))
             
             # Trim to maintain max events limit
-            await self.db.redis.ltrim("event", 0, self.MAX_EVENTS - 1)
+            await self.db.redis.ltrim("events", 0, self.MAX_EVENTS - 1)
             
             # Remove old retrieval events (older than 12 hours)
             await self._cleanupOldRetrievals()
@@ -71,7 +71,7 @@ class EventService:
             raise
             
     async def getEvents(self, count: int = 10, event_id: Optional[str] = None,
-                       bot_id: Optional[str] = None, event_type: Optional[str] = None,
+                       botId: Optional[str] = None, event_type: Optional[str] = None,
                        min_severity: Optional[int] = None, order_by: str = "timestamp",
                        order_desc: bool = True) -> List[Dict[str, Any]]:
         """
@@ -80,7 +80,7 @@ class EventService:
         Args:
             count: Number of events to retrieve
             event_id: Filter by specific event ID (returns single event)
-            bot_id: Filter by bot ID
+            botId: Filter by bot ID
             event_type: Filter by event type
             min_severity: Filter by minimum severity level
             order_by: Field to order by ('timestamp', 'severity')
@@ -96,7 +96,7 @@ class EventService:
                 
             # Get all events from Redis (we'll filter in memory for now)
             # TODO: Optimize with Redis queries for large datasets
-            events_data = await self.db.redis.lrange("event", 0, -1)
+            events_data = await self.db.redis.lrange("events", 0, -1)
             
             events = []
             for event_data in events_data:
@@ -106,7 +106,7 @@ class EventService:
                     # Apply filters
                     if event_id and event.get('id') != event_id:
                         continue
-                    if bot_id and event.get('bot_id') != bot_id:
+                    if botId and event.get('botId') != botId:
                         continue
                     if event_type and event.get('type') != event_type:
                         continue
@@ -161,7 +161,7 @@ class EventService:
                 retrieval_events.append(retrieval_event)
                 
             # Get current retrieval count
-            current_events = await self.db.redis.lrange("event", 0, -1)
+            current_events = await self.db.redis.lrange("events", 0, -1)
             current_retrievals = sum(1 for event_data in current_events 
                                    if 'retrieval' in json.loads(event_data))
             
@@ -172,11 +172,11 @@ class EventService:
                 
             # Add new retrieval events
             for event in retrieval_events:
-                await self.db.redis.lpush("event", json.dumps(event))
+                await self.db.redis.lpush("events", json.dumps(event))
                 added_count += 1
                 
             # Maintain overall event limit
-            await self.db.redis.ltrim("event", 0, self.MAX_EVENTS + self.MAX_RETRIEVALS - 1)
+            await self.db.redis.ltrim("events", 0, self.MAX_EVENTS + self.MAX_RETRIEVALS - 1)
             
             logger.info(f"Fed {added_count} events into Redis table")
             return added_count
@@ -199,14 +199,14 @@ class EventService:
             if not self.db.redis:
                 return False
                 
-            events_data = await self.db.redis.lrange("event", 0, -1)
+            events_data = await self.db.redis.lrange("events", 0, -1)
             
             for i, event_data in enumerate(events_data):
                 try:
                     event = json.loads(event_data)
                     if event.get('id') == event_id:
                         # Remove from list by value
-                        await self.db.redis.lrem("event", 1, event_data)
+                        await self.db.redis.lrem("events", 1, event_data)
                         logger.info(f"Event deleted: {event_id}")
                         return True
                 except json.JSONDecodeError:
@@ -234,7 +234,7 @@ class EventService:
             if not self.db.redis:
                 return False
                 
-            events_data = await self.db.redis.lrange("event", 0, -1)
+            events_data = await self.db.redis.lrange("events", 0, -1)
             
             for i, event_data in enumerate(events_data):
                 try:
@@ -244,7 +244,7 @@ class EventService:
                         event.update(updates)
                         
                         # Replace in Redis list
-                        await self.db.redis.lset("event", i, json.dumps(event))
+                        await self.db.redis.lset("events", i, json.dumps(event))
                         logger.info(f"Event updated: {event_id}")
                         return True
                 except json.JSONDecodeError:
@@ -261,14 +261,14 @@ class EventService:
         """Remove retrieval events older than 12 hours"""
         try:
             cutoff_time = int((datetime.utcnow() - timedelta(hours=12)).timestamp() * 1000)
-            events_data = await self.db.redis.lrange("event", 0, -1)
+            events_data = await self.db.redis.lrange("events", 0, -1)
             
             for event_data in events_data:
                 try:
                     event = json.loads(event_data)
                     if (event.get('retrieval') and 
                         event.get('retrieval') < cutoff_time):
-                        await self.db.redis.lrem("event", 1, event_data)
+                        await self.db.redis.lrem("events", 1, event_data)
                 except json.JSONDecodeError:
                     continue
                     
@@ -278,7 +278,7 @@ class EventService:
     async def _removeOldestRetrievals(self, count: int):
         """Remove oldest retrieval events"""
         try:
-            events_data = await self.db.redis.lrange("event", 0, -1)
+            events_data = await self.db.redis.lrange("events", 0, -1)
             retrieval_events = []
             
             for event_data in events_data:
@@ -294,9 +294,10 @@ class EventService:
             
             # Remove oldest
             for i in range(min(count, len(retrieval_events))):
-                await self.db.redis.lrem("event", 1, retrieval_events[i][0])
+                await self.db.redis.lrem("events", 1, retrieval_events[i][0])
                 
         except Exception as e:
             logger.warning(f"Failed to remove oldest retrievals: {e}")
+
 
 

@@ -7,44 +7,36 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 from src import db_connections
 from src.services.events import EventService
+from src.schemas.events import (
+    CreateEventRequest, EventResponse, FeedTableRequest, FeedTableResponse,
+    GetEventsResponse, UpdateEventRequest, UpdateEventResponse, 
+    DeleteEventResponse, ErrorResponse
+)
 
 router = APIRouter()
 
 # Initialize service
 event_service = EventService(db_connections)
 
-class CreateEventRequest(BaseModel):
-    event_type: str
-    data: Dict[str, Any]
-    bot_id: Optional[str] = None
-    severity: int = 0
-
-class EventResponse(BaseModel):
-    event_id: str
-    status: str
-
-class FeedTableRequest(BaseModel):
-    events: List[Dict[str, Any]]
-
-@router.post("/", response_model=EventResponse)
+@router.post("/", response_model=EventResponse, responses={500: {"model": ErrorResponse}})
 async def create_event(request: CreateEventRequest):
     """Create a new event"""
     try:
         event_id = await event_service.createEvent(
             request.event_type, 
             request.data, 
-            request.bot_id,
+            request.botId,
             request.severity
         )
         return EventResponse(event_id=event_id, status="created")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/")
+@router.get("/", response_model=GetEventsResponse, responses={500: {"model": ErrorResponse}})
 async def get_events(
     count: int = Query(10, ge=1, le=1000),
     event_id: Optional[str] = None,
-    bot_id: Optional[str] = None,
+    botId: Optional[str] = None,
     event_type: Optional[str] = None,
     min_severity: Optional[int] = None,
     order_by: str = Query("timestamp", regex="^(timestamp|severity)$"),
@@ -55,7 +47,7 @@ async def get_events(
         events = await event_service.getEvents(
             count=count,
             event_id=event_id,
-            bot_id=bot_id,
+            botId=botId,
             event_type=event_type,
             min_severity=min_severity,
             order_by=order_by,
@@ -65,7 +57,7 @@ async def get_events(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/feed")
+@router.post("/feed", response_model=FeedTableResponse, responses={500: {"model": ErrorResponse}})
 async def feed_table(request: FeedTableRequest):
     """Feed events from archive into Redis table"""
     try:
@@ -99,3 +91,5 @@ async def update_event(event_id: str, updates: Dict[str, Any]):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+

@@ -1,15 +1,18 @@
 import type { Memory } from "./memory";
 import { GoalManager, type AgentStatus } from "./goals";
-import { Feature } from "../types";
-import { InteractionManager } from "../features/chatInteraction";
+import { Feature } from "../../types";
+import { type InteractionManager } from "../features/chatInteraction";
 import { logger } from "../utils";
 import { Bot } from "../bot";
 import { Item } from "prismarine-item";
+import mineflayer, { type Bot as MineflayerBot } from "mineflayer";
+
 
 export interface AgentState {
   connected: boolean;
   status?: AgentStatus;
   username?: string;
+  subPort?: number;
   health?: number;
   food?: number;
   position?: { x: number; y: number; z: number };
@@ -22,29 +25,33 @@ export interface AgentState {
 
   memories?: any; // interactions, important events, things of interest, evolution
   inventory?: Item[];
+  stats?: any; // Interactions stats
+
+  timestamp?: number;
 }
 
 export class Agent {
-  private botClass: Bot; // Reference to the Bot instance
+  private bot: MineflayerBot | null = null;
   private memory: Memory;
   private goalManager: GoalManager;
   private interactionManager: InteractionManager | null = null;
   private featureManager: Set<Feature>;
 
-  constructor(memory: Memory, goalManager: GoalManager, botClass: Bot) {
-    this.botClass = botClass;
+  constructor(bot: MineflayerBot | null, memory: Memory, goalManager: GoalManager, interactionManager: InteractionManager | null, featureManager: Set<Feature>) {
+    this.bot = bot;
     this.memory = memory;
     this.goalManager = goalManager;
-    this.interactionManager = this.botClass.interactionManager;
-    this.featureManager = this.botClass.featureManager;
+    this.interactionManager = interactionManager;
+    this.featureManager = featureManager;
   }
 
   getStatus(): AgentState {
-    if (!this.botClass || !this.botClass.isConnected) {
-      return { connected: false };
+    if (!this.bot) {
+      return this.memory.agentMemory.data;
+      // return { connected: false };
     }
 
-    return this.memory.agentMemory.data;
+    return this.memory?.agentMemory?.data;
   }
 
   getFeatures(): Set<{ name: string; status: boolean }> {
@@ -59,40 +66,46 @@ export class Agent {
     return this.goalManager;
   }
 
-  updateStatus(newState: Partial<AgentState>): void {
-    if (!this.botClass || !this.botClass.isConnected) return;
-
-    const status = {
-      connected: true,
-      username: this.botClass?.bot?.username,
-      health: this.botClass?.bot?.health,
-      food: this.botClass?.bot?.food,
-      position: this.botClass?.bot?.entity.position,
-      dimension: this.botClass?.bot?.game.dimension,
-      gameMode: this.botClass?.bot?.game.gameMode,
-      currentGoal: null,
-      featureList: Array.from(this.getFeatures()),
-      inventory: this.botClass?.bot?.inventory.items(),
-      interactions: this.interactionManager && this.interactionManager.getInteractionStats(),
+  updateStatus(newState: Partial<AgentState>, log: boolean = true): void {
+    if (!this.bot) {
+      logger.info("Bot not connected, skipping status update");
+      return;
     };
 
-    const state = { ...this.memory.agentMemory.data, ...status, ...newState };
-    this.memory.updateAgentState(state);
-    this.memory.addMemory("agent", "agent", state, { subType: "agent_updated" });
-    logger.debug("Agent state updated:", state);
+    try {
+      const status: AgentState = {
+        connected: true,
+        username: this.bot?.username,
+        health: this.bot?.health,
+        food: this.bot?.food,
+        position: this.bot?.entity?.position,
+        dimension: this.bot?.game?.dimension,
+        gameMode: this.bot?.game?.gameMode,
+        currentGoal: null,
+        featureList: Array.from(this.getFeatures()),
+        inventory: this.bot?.inventory?.items(),
+        stats: this.interactionManager && this.interactionManager?.getInteractionStats(),
+        timestamp: Date.now(),
+      };
+  
+      const state = { ...this.memory?.agentMemory?.data, ...status, ...newState };
+      this.memory.updateAgentState(state);
+      log && logger.debug("Agent state updated:", state);
+    } catch (error) {
+      logger.error("Failed to update agent state:", error);
+    }
   }
 
   // Update agent state based on current goal
-  updateGoalState(): void {
-    const activeGoal = this.goalManager.getActiveGoal();
-    const status = this.goalManager.determineAgentStatus();
+  // updateGoalState(): void {
+  //   const activeGoal = this.goalManager.getActiveGoal();
+  //   const status = this.goalManager.determineAgentStatus();
 
-    this.updateStatus({
-      currentGoal: activeGoal ? activeGoal.name : null,
-      status,
-    });
-  }
-  
+  //   this.updateStatus({
+  //     currentGoal: activeGoal ? activeGoal.name : null,
+  //     status,
+  //   });
+  // }
 }
 
 // handleLowHealth(): void {
@@ -217,5 +230,8 @@ export class Agent {
 
 //   return recommendations;
 // }
+
+
+
 
 
