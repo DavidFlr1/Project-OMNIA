@@ -109,25 +109,18 @@ export class Bot {
   private setupEventHandlers(): void {
     if (!this.bot) return;
 
+    this.bot.on('whisper', (username, message) => {
+      if (username === this.bot!.username) return;
+      logger.info(`Whisper: <${username}> ${message}`);
+      
+      this.chatHandler(username, message, "whisper");
+    })
+
     this.bot.on("chat", (username, message) => {
       if (username === this.bot!.username) return;
-
       logger.info(`Chat: <${username}> ${message}`);
-      // this.memory.addChatMessage(username, message);
 
-      // Process commands from chat (only if they start with ! and are targeted at this bot)
-      if (message.startsWith("!")) {
-        // Check if this command is targeted at this specific bot
-        if (this.interactionManager && this.interactionManager.shouldProcessCommand(message, username)) {
-          logger.info(`Processing targeted command from ${username}: ${message}`);
-          const command = this.extractCommand(message);
-          if (command) {
-            this.executeCommand(command);
-          }
-        } else {
-          logger.debug(`Command not targeted at this bot (${this.bot!.username})`);
-        }
-      }
+      this.chatHandler(username, message, "chat");
       // Note: Interaction manager handles regular chat for conversations
     });
     
@@ -184,6 +177,28 @@ export class Bot {
     });
   }
 
+  private chatHandler(username: string, message: string, type: "chat" | "whisper"): void {
+    // Process commands from chat (only if they start with ! and are targeted at this bot)
+    if (message.startsWith("!")) {
+      // Check if this command is targeted at this specific bot
+      if (this.interactionManager && this.interactionManager.shouldProcessCommand(message, username)) {
+        logger.info(`Processing targeted command from ${username}: ${message}`);
+        const command = this.extractCommand(message);
+        if (command) {
+          this.executeCommand(command);
+        }
+      } else {
+        logger.debug(`Command not targeted at this bot (${this.bot!.username})`);
+      }
+    } else {
+      // Store chat message in memory
+      // this.memory.createEvent("chat_message", {
+      //   username,
+      //   message,
+      // });
+    }
+  }
+
   private extractCommand(message: string): string | null {
     const botName = this.bot!.username.toLowerCase();
 
@@ -238,6 +253,7 @@ export class Bot {
     return this.agent;
   }
 }
+
 
 
 

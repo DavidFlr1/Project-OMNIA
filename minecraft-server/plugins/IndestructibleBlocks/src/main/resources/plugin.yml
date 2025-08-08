@@ -1,0 +1,23 @@
+name: IndestructibleBlocks
+version: 1.0.0
+main: me.indestructibleblocks.IndestructibleBlocksPlugin
+api-version: 1.21
+author: YourName
+description: Make specific blocks indestructible
+
+commands:
+  blocklock:
+    description: Manage indestructible blocks
+    usage: /blocklock <set|remove|list> [block]
+    permission: indestructibleblocks.use
+
+permissions:
+  indestructibleblocks.use:
+    description: Allows use of blocklock commands
+    default: op
+  indestructibleblocks.admin:
+    description: Full access to blocklock commands
+    default: op
+  indestructibleblocks.bypass:
+    description: Bypass block protection
+    default: op

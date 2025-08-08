@@ -41,13 +41,13 @@ export class CommandHandler {
           await this.moveCommands.follow(bot, args, memory);
           break;
         case "reach":
-          await this.moveCommands.reach(bot, args);
+          await this.moveCommands.reach(bot, args, memory);
           break;
         case "patrol":
-          await this.moveCommands.patrol(bot, args);
+          await this.moveCommands.patrol(bot, args, memory);
           break;
         case "stay":
-          await this.moveCommands.stay(bot);
+          await this.moveCommands.stay(bot, memory);
           break;
 
         // Exploration commands
@@ -77,7 +77,7 @@ export class CommandHandler {
           await this.build.place(bot, args);
           break;
 
-        // Combat commands
+        //? Combat commands
         case "attack":
           await this.combatCommands.attack(bot, args);
           break;

@@ -1,0 +1,11 @@
+name: BotCommands
+version: "1.0"
+main: BotCommandsPlugin
+api-version: 1.19
+description: Bot command interface with autocomplete
+
+commands:
+  bot:
+    description: Send commands to bot players
+    usage: /bot <target_player> <command> [args...]
+    aliases: [b]

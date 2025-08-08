@@ -70,24 +70,24 @@
     },
     "gathering": {
       "mine": {
-        "syntax": "mine <block_type> <quantity> [range] [scout] [scout_tries]",
-        "args": "<block_type> <quantity> [range] [scout] [scout_tries]",
+        "syntax": "mine <block> <quantity> [range] [scout] [scout_tries]",
+        "args": "<block> <quantity> [range] [scout] [scout_tries]",
         "description": "Mine specific blocks with optional scouting",
         "example": "mine diamond_ore 3 32 true 5",
         "status": true,
         "intent_keywords": ["mine", "dig", "extract", "harvest blocks", "collect blocks"]
       },
       "collect": {
-        "syntax": "collect <item_type> [amount] [range]",
-        "args": "<item_type> [amount] [range]",
+        "syntax": "collect <item> [amount] [range]",
+        "args": "<item> [amount] [range]",
         "description": "Collect items from the ground",
         "example": "collect oak_planks 64 32",
         "status": true,
         "intent_keywords": ["collect", "gather", "pick up", "retrieve", "grab"]
       },
       "harvest": {
-        "syntax": "harvest <crop_type> [quantity] [range]",
-        "args": "<crop_type> [quantity] [range]",
+        "syntax": "harvest <crop> [quantity] [range]",
+        "args": "<crop> [quantity] [range]",
         "description": "Harvest mature crops",
         "example": "harvest wheat 3 32",
         "status": true,
@@ -157,7 +157,7 @@
       },
       "equip": {
         "syntax": "equip <item>",
-        "args": "<item> [hand | offhand | head | torso | legs | feet]",
+        "args": "<item> [hand|offhand|head|torso|legs|feet]",
         "description": "Equip specific item",
         "example": "equip diamond_pickaxe hand",
         "status": true,
@@ -180,19 +180,19 @@
         "intent_keywords": ["interact", "use", "activate", "perform action on"]
       },
       "store": {
-        "syntax": "store <pick | put> <x> <y> <z> <item_name> [quantity]",
-        "args": "<pick | put> <x> <y> <z> <item_name> [quantity]",
+        "syntax": "store <pick|put> <x> <y> <z> <item> [quantity]",
+        "args": "<pick|put> <x> <y> <z> <item> [quantity]",
         "description": "Store item in chest",
         "example": "store pick 100 64 200 diamond 5",
         "status": true,
         "intent_keywords": ["store", "save", "keep", "preserve", "put away"]
       },
       "disable": {
-        "syntax": "disable <comands | chat | all> [on|off]",
-        "args": "<comands | chat | all> [on|off]",
+        "syntax": "disable <comands|chat|all> [on|off]",
+        "args": "<comands|chat|all> [on|off]",
         "description": "Manage disable system",
         "example": "disable comands on",
-        "status": false,
+        "status": true,
         "intent_keywords": ["disable", "enable", "activate", "deactivate"]
       }
     },
@@ -239,16 +239,8 @@
         "args": "<message>",
         "description": "Send chat message",
         "example": "chat Hello everyone!",
-        "status": false,
+        "status": true,
         "intent_keywords": ["chat", "say", "speak", "message", "talk"]
-      },
-      "say": {
-        "syntax": "say <message>",
-        "args": "<message>",
-        "description": "Send chat message (alias for chat)",
-        "example": "say Hello world!",
-        "status": false,
-        "intent_keywords": ["say", "speak", "tell", "announce"]
       }
     },
     "information": {
@@ -257,7 +249,7 @@
         "args": "",
         "description": "List online players",
         "example": "players",
-        "status": false,
+        "status": true,
         "intent_keywords": ["players", "online", "who", "list players"]
       },
       "entities": {
@@ -265,7 +257,7 @@
         "args": "",
         "description": "List nearby entities",
         "example": "entities",
-        "status": false,
+        "status": true,
         "intent_keywords": ["entities", "mobs", "nearby", "creatures"]
       },
       "config": {
