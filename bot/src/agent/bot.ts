@@ -151,9 +151,11 @@ export class Bot {
       const health = this.bot!.health;
       const food = this.bot!.food;
       logger.debug(`Health: ${health}, Food: ${food}`);
+      
 
       if (health < 10) {
         logger.warn("Low health detected");
+        this.memory.createEvent("bot_log", { event: 'low_health', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
       }
     });
 
@@ -164,16 +166,19 @@ export class Bot {
 
     this.bot.on("kicked", (reason) => {
       logger.error(`Bot was kicked: ${JSON.stringify(reason, null, 2)}`);
+      this.memory.createEvent("system_event", { event: 'kicked', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
       this.isConnected = false;
     });
 
     this.bot.on("end", () => {
       logger.info("Bot disconnected");
+      this.memory.createEvent("system_event", { event: 'bot_stopped', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
       this.isConnected = false;
     });
 
     this.bot.on("error", (error) => {
       logger.error("Bot error:", JSON.stringify(error, null, 2));
+      this.memory.createEvent("system_event", { event: 'bot_error', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
     });
   }
 
@@ -236,6 +241,7 @@ export class Bot {
   async disconnect(): Promise<void> {
     if (this.bot && this.isConnected) {
       logger.info("Disconnecting bot...");
+      this.memory.createEvent("system_event", { event: "bot_stopped", metadata: { username: this.bot.username } });
       this.bot.quit();
       this.isConnected = false;
     }

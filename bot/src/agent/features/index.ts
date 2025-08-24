@@ -52,67 +52,70 @@ export class CommandHandler {
 
         // Exploration commands
         case "explore":
-          await this.exploreCommands.explore(bot, args);
+          await this.exploreCommands.explore(bot, args, memory);
           break;
-        case "scout":
-          await this.exploreCommands.scout(bot, args);
-          break;
-        case "map":
-          await this.exploreCommands.mapArea(bot, args);
+        case "reset_explore":
+          await this.exploreCommands.resetExplore(bot, memory);
           break;
 
         // Gathering commands
         case "mine":
-          await this.gatherCommands.mine(bot, args);
+          await this.gatherCommands.mine(bot, args, memory);
           break;
         case "collect":
-          await this.gatherCommands.collect(bot, args);
+          await this.gatherCommands.collect(bot, args, memory);
           break;
         case "harvest":
-          await this.gatherCommands.harvest(bot, args);
+          await this.gatherCommands.harvest(bot, args, memory);
           break;
 
         // Building commands
         case "place":
-          await this.build.place(bot, args);
+          await this.build.place(bot, args, memory);
           break;
 
         //? Combat commands
         case "attack":
-          await this.combatCommands.attack(bot, args);
+          await this.combatCommands.attack(bot, args, memory);
           break;
         case "defend":
-          await this.combatCommands.defend(bot, args);
+          await this.combatCommands.defend(bot, args, memory);
           break;
         case "flee":
-          await this.combatCommands.flee(bot, args);
+          await this.combatCommands.flee(bot, args, memory);
           break;
 
         // Utility commands
         case "status":
-          await this.utilityCommands.showStatus(bot);
+          await this.utilityCommands.showStatus(bot, memory);
           break;
         case "chat":
-          await this.utilityCommands.chat(bot, args);
+          await this.utilityCommands.chat(bot, args, memory);
           break;
         case "inventory":
-          await this.utilityCommands.showInventory(bot);
+          await this.utilityCommands.showInventory(bot, memory);
           break;
         case "equip":
-          await this.utilityCommands.equip(bot, args);
+          await this.utilityCommands.equip(bot, args, memory);
           break;
         case "drop":
-          await this.utilityCommands.drop(bot, args);
+          await this.utilityCommands.drop(bot, args, memory);
           break;
         case "interact":
-          await this.utilityCommands.interact(bot, args);
+          await this.utilityCommands.interact(bot, args, memory);
           break;
         case "store":
-          await this.utilityCommands.store(bot, args);
+          await this.utilityCommands.store(bot, args, memory);
           break;
         case "feature":
-          await this.utilityCommands.feature(bot, args, featureManager);
+          await this.utilityCommands.feature(bot, args, featureManager, memory);
           break;
+        case "use":
+          await this.utilityCommands.use(bot, args, memory);
+          break;
+        case "stop":
+        await this.utilityCommands.stop(bot, args, memory);
+        break;
 
         // Help commands
         case "help":

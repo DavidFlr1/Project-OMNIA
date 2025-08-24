@@ -44,28 +44,20 @@
     },
     "exploration": {
       "explore": {
-        "syntax": "explore [radius]",
-        "args": "[radius]",
-        "description": "Explore area within radius",
-        "example": "explore 50",
+        "syntax": "explore <radius|scout> <distance> [north|south|east|west|northeast|northwest|southeast|southwest] [report_at] [item|block|entity]",
+        "args": "<radius|scout> <distance> [north|south|east|west|northeast|northwest|southeast|southwest] [report_at] [goals...]",
+        "description": "Explore area within radius or scout in a specific direction reporting discoveries every report_at blocks",
+        "example": "explore radius 50 30 diamond_ore",
         "status": true,
         "intent_keywords": ["explore", "scout area", "search", "investigate", "survey"]
       },
-      "scout": {
-        "syntax": "scout <direction> [distance]",
-        "args": "<direction> [distance]",
-        "description": "Scout in a specific direction",
-        "example": "scout north 30",
+      "reset_explore": {
+        "syntax": "reset_explore",
+        "args": "",
+        "description": "Reset explored areas ",
+        "example": "reset_explore",
         "status": true,
-        "intent_keywords": ["scout", "reconnaissance", "survey direction", "check direction"]
-      },
-      "map": {
-        "syntax": "map [radius]",
-        "args": "[radius]",
-        "description": "Map surrounding area",
-        "example": "map 25",
-        "status": true,
-        "intent_keywords": ["map", "chart", "survey", "analyze area", "scan"]
+        "intent_keywords": ["reset", "explore", "clear"]
       }
     },
     "gathering": {
@@ -96,7 +88,7 @@
     },
     "building": {
       "place": {
-        "syntax": "place <position(s)> <block> [invasive|non-invasive]",
+        "syntax": "place <(x y z)|(x1 y1 z1 x2 y2 z2)|[(x1 y1 z1), ..., (xN yN zN)]> <block> [invasive|non-invasive]",
         "args": "<position(s)> <block> [invasive|non-invasive]",
         "description": "Place blocks at specific positions",
         "example": "single 'place 10 64 10 stone invasive' or multiple 'place [10 64 10, 15 64 15, 20 64 20] stone non-invasive' or range 'place 10 64 10 15 64 15 stone non-invasive'",
@@ -172,8 +164,8 @@
         "intent_keywords": ["drop", "throw", "discard", "leave", "remove item"]
       },
       "interact": {
-        "syntax": "interact <block> [type]",
-        "args": "<block> [type]",
+        "syntax": "interact <x> <y> <z> [hand|hoe|shovel|bucket|shears|axe|flint]",
+        "args": "<block> [hand|hoe|shovel|bucket|shears|axe|flint]",
         "description": "Interact with a block",
         "example": "interact lever hand",
         "status": true,

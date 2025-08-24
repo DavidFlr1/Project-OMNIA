@@ -141,6 +141,12 @@ export class MoveCommands {
 
       const goal = new goals.GoalFollow(target.entity, 2);
       await bot.pathfinder.goto(goal);
+
+      memory.createEvent("command_executed", {
+        command: `reach ${playerName}`,
+        status: "completed",
+        message: `Reached player ${playerName}`,
+      });
     } catch (error) {
       logger.error("Failed to reach player:", error);
       memory.createEvent("command_executed", {
@@ -208,6 +214,8 @@ export class MoveCommands {
         break;
       }
     }
+
+    memory.createEvent("command_executed", { command: `patrol ${args.join(" ")}`, status: "completed" });
   }
 
   async stay(bot: MineflayerBot, memory: Memory): Promise<void> {

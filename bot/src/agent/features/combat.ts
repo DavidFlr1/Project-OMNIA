@@ -1,17 +1,20 @@
 import type { Bot as MineflayerBot } from "mineflayer";
 import { goals } from "mineflayer-pathfinder";
 import { logger } from "../utils";
+import { Memory } from "../core/memory";
 
 export class CombatCommands {
   private isDefending = false;
   private attackTarget: string | null = null;
 
-  async attack(bot: MineflayerBot, args: string[]): Promise<void> {
+  async attack(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 1) {
       bot.chat("Usage: attack <target_name>");
+      memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "invalid", message: "Invalid args. `Usage: attack <target_name>`" });
       return;
     }
 
+    memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "in_progress" });
     const targetName = args[0];
 
     try {
@@ -22,11 +25,13 @@ export class CombatCommands {
 
       if (!target) {
         bot.chat(`Target ${targetName} not found`);
+        memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "failed", message: `Target ${targetName} not found` });
         return;
       }
 
       logger.info(`Attacking target: ${targetName}`);
       bot.chat(`Attacking ${targetName}`);
+      memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "info", message: `Attacking ${targetName}` });
 
       this.attackTarget = targetName;
 
@@ -37,16 +42,20 @@ export class CombatCommands {
         // Fallback manual attack
         await this.manualAttack(bot, target);
       }
+      memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "completed", message: `Attacking ${targetName}` });
     } catch (error) {
       logger.error("Attack failed:", error);
       bot.chat("Attack failed");
+      memory.createEvent("command_executed", { command: `attack ${args.join(" ")}`, status: "failed", message: "Attack failed" });
     }
   }
 
-  async defend(bot: MineflayerBot, args: string[]): Promise<void> {
+  async defend(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
+    memory.createEvent("command_executed", { command: `defend ${args.join(" ")}`, status: "in_progress" });
     this.isDefending = true;
     bot.chat("Entering defensive mode");
     logger.info("Entering defensive mode");
+    memory.createEvent("command_executed", { command: `defend ${args.join(" ")}`, status: "completed", message: "Entering defensive mode" });
 
     // Set up defensive behavior
     bot.on("entityHurt", (entity) => {
@@ -62,12 +71,14 @@ export class CombatCommands {
     });
   }
 
-  async flee(bot: MineflayerBot, args: string[]): Promise<void> {
+  async flee(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
+    memory.createEvent("command_executed", { command: `flee ${args.join(" ")}`, status: "in_progress" });
     const distance = args[0] ? Number.parseInt(args[0]) : 20;
 
     try {
       logger.info(`Fleeing ${distance} blocks away`);
       bot.chat("Fleeing from danger");
+      memory.createEvent("command_executed", { command: `flee ${args.join(" ")}`, status: "info", message: `Fleeing ${distance} blocks away` });
 
       // Find hostile entities nearby
       const hostiles = Object.values(bot.entities).filter(
@@ -84,12 +95,15 @@ export class CombatCommands {
         await bot.pathfinder.goto(goal);
 
         bot.chat("Reached safe distance");
+        memory.createEvent("command_executed", { command: `flee ${args.join(" ")}`, status: "completed", message: "Reached safe distance" });
       } else {
         bot.chat("No immediate threats detected");
+        memory.createEvent("command_executed", { command: `flee ${args.join(" ")}`, status: "completed", message: "No immediate threats detected" });
       }
     } catch (error) {
       logger.error("Flee failed:", error);
       bot.chat("Failed to flee");
+      memory.createEvent("command_executed", { command: `flee ${args.join(" ")}`, status: "failed", message: "Failed to flee" });
     }
   }
 

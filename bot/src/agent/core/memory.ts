@@ -1,3 +1,4 @@
+import { Discovery, ExplorationData, GoalData } from "../features/explore";
 import { logger } from "../utils";
 import { AgentState } from "./agent";
 
@@ -11,7 +12,7 @@ export type EventType =
   | "world_update"
   | "goal_progress"
   | "player_interaction"
-  | "bot_action"
+  | "bot_log"
   | "system_event";
 
 export type Data<T extends EventType = EventType> = T extends "chat_message"
@@ -19,9 +20,9 @@ export type Data<T extends EventType = EventType> = T extends "chat_message"
       username: string;
       message: string;
       response?: string;
-      distance: number;
-      isNearby: boolean;
-      isLooking: boolean;
+      distance?: number;
+      isNearby?: boolean;
+      isLooking?: boolean;
     }
   : T extends "command_executed"
   ? {
@@ -32,7 +33,11 @@ export type Data<T extends EventType = EventType> = T extends "chat_message"
     }
   : T extends "discovery_made"
   ? {
-      discovery: string;
+      event: string;
+      blocks?: Discovery[]
+      entities?: Discovery[]
+      structures?: Discovery[]
+      goals?: Discovery[]
       data?: any;
       metadata?: any;
     }
@@ -54,8 +59,10 @@ export type Data<T extends EventType = EventType> = T extends "chat_message"
       data?: any;
       metadata?: any;
     }
-  : T extends "bot_action"
+  : T extends "bot_log"
   ? {
+      event: string;
+      log: string;
       data: any;
       metadata?: any;
     }

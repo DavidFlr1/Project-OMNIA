@@ -2,6 +2,7 @@ import type { Bot as MineflayerBot } from "mineflayer";
 import { Vec3 } from "vec3";
 import { goals } from "mineflayer-pathfinder";
 import { logger } from "../utils";
+import { Memory } from "../core/memory";
 
 interface Position {
   x: number;
@@ -17,22 +18,33 @@ interface PlacementResult {
 }
 
 export class BuildCommands {
-  async place(bot: MineflayerBot, args: string[]): Promise<void> {
+  async place(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 2) {
       bot.chat("Usage: place <position(s)> <block> [invasive|non-invasive]");
       bot.chat("Examples:");
       bot.chat("place 10 64 10 stone invasive");
       bot.chat("place 10 64 10 15 64 15 stone non-invasive");
       bot.chat("place [10 64 10, 15 64 15, 20 64 20] stone");
+      memory.createEvent("command_executed", { 
+        command: `place ${args.join(" ")}`, 
+        status: "invalid", 
+        message: "Invalid args. `Usage: place <position(s)> <block> [invasive|non-invasive]`" 
+      });
       return;
     }
 
     try {
       // Parse positions, block type, and invasive flag
       const { positions, blockType, invasive } = this.parsePlaceArguments(args);
+      memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "in_progress" });
 
       if (positions.length === 0) {
         bot.chat("Invalid position format");
+        memory.createEvent("command_executed", { 
+          command: `place ${args.join(" ")}`, 
+          status: "invalid", 
+          message: "Invalid position format" 
+        });
         return;
       }
 
@@ -43,23 +55,29 @@ export class BuildCommands {
         bot.chat(`No ${blockType} blocks in inventory`);
         return;
       }
+      memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "info", message: `No ${blockType} blocks in inventory` });
 
       bot.chat(
         `Placing ${Math.min(blockCount, positions.length)} ${blockType} blocks at ${positions.length} positions`
       );
+      memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "info", message: `Placing ${Math.min(blockCount, positions.length)} ${blockType} blocks at ${positions.length} positions` });
 
       // Start placing blocks
       const result = await this.placeBlocks(bot, positions, blockType, invasive);
 
       if (result.success) {
         bot.chat(`Successfully placed all blocks`);
+        memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "completed" });
       } else {
         bot.chat(`Placement incomplete: Missing ${result.missingQuantity} ${result.blockName} blocks`);
+        memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "failed", message: `Placement incomplete: Missing ${result.missingQuantity} ${result.blockName} blocks` });
         bot.chat(`Remaining positions: ${result.remainingPositions.length}`);
+        memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "failed", message: `Remaining positions: ${result.remainingPositions.length}` });
       }
     } catch (error) {
       logger.error("Block placement failed:", error);
       bot.chat("Block placement failed");
+      memory.createEvent("command_executed", { command: `place ${args.join(" ")}`, status: "failed", message: "Block placement failed" });
     }
   }
 

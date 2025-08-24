@@ -207,20 +207,82 @@ public class BotCommandsPlugin extends JavaPlugin implements TabCompleter {
                     break;
                     
                 case "place":
-                    if (argIndex == 1) { // After position, suggest blocks
-                        completions.addAll(getAllBlocks());
-                    } else if (argIndex == 2) { // After block, suggest invasive options
-                        completions.addAll(Arrays.asList("invasive", "non-invasive"));
+                    // Complex position parsing for place command
+                    if (argIndex == 0) {
+                        // First argument could be x coordinate, "[" for array, or number
+                        completions.addAll(Arrays.asList("<x>", "[<positions>]"));
+                    } else {
+                        // Try to determine if we're still in position arguments
+                        String firstArg = args.length > 2 ? args[2] : "";
+                        
+                        if (firstArg.startsWith("[")) {
+                            // Array format - suggest closing bracket and block
+                            if (!String.join(" ", Arrays.copyOfRange(args, 2, args.length)).contains("]")) {
+                                completions.add("]");
+                            } else {
+                                // After closing bracket, suggest blocks
+                                completions.addAll(getAllBlocks());
+                                completions.addAll(Arrays.asList("invasive", "non-invasive"));
+                            }
+                        } else {
+                            // Single position (x y z) or range (x1 y1 z1 x2 y2 z2)
+                            if (argIndex <= 5) { // Still in coordinate range
+                                completions.add("<" + (argIndex == 1 ? "y" : argIndex == 2 ? "z" : 
+                                               argIndex == 3 ? "x2" : argIndex == 4 ? "y2" : "z2") + ">");
+                            } else if (argIndex == 6) { // After coordinates, suggest blocks
+                                completions.addAll(getAllBlocks());
+                            } else if (argIndex == 7) { // After block, suggest invasive options
+                                completions.addAll(Arrays.asList("invasive", "non-invasive"));
+                            }
+                        }
+                    }
+                    break;
+                    
+                case "drop":
+                    if (argIndex == 0) {
+                        completions.addAll(getAllItems());
+                    } else if (argIndex == 1) {
+                        completions.add("<quantity>");
+                    }
+                    break;
+                    
+                case "interact":
+                    if (argIndex == 0) completions.add("<x>");
+                    else if (argIndex == 1) completions.add("<y>");
+                    else if (argIndex == 2) completions.add("<z>");
+                    else if (argIndex == 3) {
+                        completions.addAll(Arrays.asList("hand", "hoe", "shovel", "bucket", "shears", "axe", "flint"));
                     }
                     break;
                     
                 case "store":
                     if (argIndex == 0) {
                         completions.addAll(Arrays.asList("pick", "put"));
-                    } else if (argIndex == 4) { // After coordinates, suggest items
-                        completions.addAll(Arrays.asList("diamond", "iron_ingot", "gold_ingot", 
-                            "emerald", "coal", "redstone"));
+                    } else if (argIndex == 1) completions.add("<x>");
+                    else if (argIndex == 2) completions.add("<y>");
+                    else if (argIndex == 3) completions.add("<z>");
+                    else if (argIndex == 4) { // After coordinates, suggest items
+                        completions.addAll(getAllItems());
                     } else if (argIndex == 5) completions.add("<quantity>");
+                    break;
+                    
+                case "explore":
+                    if (argIndex == 0) {
+                        completions.addAll(Arrays.asList("radius", "scout"));
+                    } else if (argIndex == 1) {
+                        completions.add("<distance>");
+                    } else if (argIndex == 2) {
+                        completions.addAll(Arrays.asList("north", "south", "east", "west", 
+                                                       "northeast", "northwest", "southeast", "southwest"));
+                    } else if (argIndex == 3) {
+                        completions.add("<report_at>");
+                    } else if (argIndex >= 4) {
+                        // Goals can be blocks, items, or entities
+                        completions.addAll(getAllBlocks());
+                        completions.addAll(getAllItems());
+                        completions.addAll(Arrays.asList("zombie", "skeleton", "creeper", "spider", "cow", 
+                                                        "pig", "sheep", "chicken", "villager", "iron_golem"));
+                    }
                     break;
                     
                 case "equip":
@@ -244,6 +306,7 @@ public class BotCommandsPlugin extends JavaPlugin implements TabCompleter {
         return completions;
     }
 }
+
 
 
 
