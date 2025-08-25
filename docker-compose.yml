@@ -8,44 +8,59 @@ services:
     volumes:
       - ./minecraft-server/world:/data/world
       - ./minecraft-server/world/ops.json:/data/ops.json
+      - ./minecraft-server/plugins:/data/plugins
     networks:
-      - minecraft-network
-
-  bot-logic:
-    build: ./bot-logic
-    ports:
-      - "8000:8000"
-    environment:
-      - FASTAPI_BRIDGE_URL=http://fastapi-bridge:8001
-    depends_on:
-      - fastapi-bridge
-    networks:
-      - minecraft-network
-
-  fastapi-bridge:
-    build: ./fastapi-bridge
-    ports:
-      - "8001:8001"
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    networks:
-      - minecraft-network
+      - omnia-network
 
   bot-agent:
-    build: ./bot-agent
+    build: ./bot
     environment:
       - MINECRAFT_HOST=minecraft-server
       - MINECRAFT_PORT=25565
       - MINECRAFT_USERNAME=MinecraftBot
-      - BOT_LOGIC_URL=http://bot-logic:8000
+      - MINECRAFT_PASSWORD=${MINECRAFT_PASSWORD:-}
       - API_PORT=3001
+      - API_HOST=0.0.0.0
+      - BOT_LOGIC_PORT=4001
+      - BOT_LOGIC_HOST=http://localhost
+      - GOVERNOR_URL=http://governor:5000
+      - STORAGE_SERVICE_URL=http://storage-service:8000/api/v1
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
       - "3001:3001"
+      - "4001:4001"
     depends_on:
       - minecraft-server
-      - bot-logic
+      - governor
+      - storage-service
+      - redis
     networks:
-      - minecraft-network
+      - omnia-network
+
+  governor:
+    build: ./governor
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AUTH_SECRET=${AUTH_SECRET}
+    networks:
+      - omnia-network
+
+  storage-service:
+    build: ./storage-service
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    depends_on:
+      - redis
+    networks:
+      - omnia-network
 
   redis:
     image: redis:latest
@@ -54,10 +69,10 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - minecraft-network
+      - omnia-network
 
 networks:
-  minecraft-network:
+  omnia-network:
     driver: bridge
 
 volumes:

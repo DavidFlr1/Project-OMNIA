@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  minecraft-server:
+    build: .
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./world:/data/world
+      - ./world/ops.json:/data/ops.json
+      - ./plugins:/data/plugins
+    restart: unless-stopped
+    environment:
+      - MEMORY=6G
+    networks:
+      - minecraft-network
+
+networks:
+  minecraft-network:
+    driver: bridge
