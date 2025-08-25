@@ -1,0 +1,27 @@
+name: Deploy Minecraft Server
+
+on:
+  push:
+    branches: [main]
+    paths: 
+      - 'minecraft-server/**'
+      - '.env.example'
+      - 'docker-compose.yml'
+      - 'README.md'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GCP VM
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_VM_USER }}
+          key: ${{ secrets.GCP_VM_SSH_KEY }}
+          script: |
+            cd omnia
+            git sparse-checkout set minecraft-server .env.example docker-compose.yml README.md
+            git pull origin main
+            cd minecraft-server
+            ./deploy.sh
