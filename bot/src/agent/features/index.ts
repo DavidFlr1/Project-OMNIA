@@ -98,6 +98,9 @@ export class CommandHandler {
         case "equip":
           await this.utilityCommands.equip(bot, args, memory);
           break;
+        case "look_at":
+          await this.utilityCommands.lookAt(bot, args, memory);
+          break;
         case "drop":
           await this.utilityCommands.drop(bot, args, memory);
           break;

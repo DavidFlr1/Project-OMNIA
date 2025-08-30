@@ -128,6 +128,79 @@ export class UtilityCommands {
     }
   }
 
+  async lookAt(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
+    if (args.length === 0) {
+      bot.chat("Usage: lookAt <player | x> [y] [z]");
+      memory.createEvent("command_executed", { 
+        command: `lookAt ${args.join(" ")}`, 
+        status: "invalid", 
+        message: "Invalid args. `Usage: lookAt <player | x> [y] [z]`" 
+      });
+      return;
+    }
+
+    memory.createEvent("command_executed", { command: `lookAt ${args.join(" ")}`, status: "in_progress" });
+
+    try {
+      // Check if first argument is a player name
+      const firstArg = args[0];
+      const player = bot.players[firstArg];
+
+      if (player && player.entity) {
+        // Look at player
+        const playerPos = player.entity.position.offset(0, player.entity.height * 0.9, 0);
+        await bot.lookAt(playerPos);
+        bot.chat(`Looking at ${firstArg}`);
+        logger.info(`Looking at player: ${firstArg}`);
+        memory.createEvent("command_executed", { 
+          command: `lookAt ${args.join(" ")}`, 
+          status: "completed", 
+          message: `Looking at player ${firstArg}` 
+        });
+      } else if (args.length >= 3) {
+        // Look at coordinates
+        const x = Number.parseFloat(args[0]);
+        const y = Number.parseFloat(args[1]);
+        const z = Number.parseFloat(args[2]);
+
+        if (isNaN(x) || isNaN(y) || isNaN(z)) {
+          bot.chat("Invalid coordinates. Please provide numbers.");
+          memory.createEvent("command_executed", { 
+            command: `lookAt ${args.join(" ")}`, 
+            status: "failed", 
+            message: "Invalid coordinates" 
+          });
+          return;
+        }
+
+        const targetPos = new Vec3(x, y, z);
+        await bot.lookAt(targetPos);
+        bot.chat(`Looking at (${x}, ${y}, ${z})`);
+        logger.info(`Looking at coordinates: (${x}, ${y}, ${z})`);
+        memory.createEvent("command_executed", { 
+          command: `lookAt ${args.join(" ")}`, 
+          status: "completed", 
+          message: `Looking at coordinates (${x}, ${y}, ${z})` 
+        });
+      } else {
+        bot.chat("Player not found or invalid coordinates. Use: lookAt <player> or lookAt <x> <y> <z>");
+        memory.createEvent("command_executed", { 
+          command: `lookAt ${args.join(" ")}`, 
+          status: "failed", 
+          message: "Player not found or invalid coordinates" 
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to look at target:", error);
+      bot.chat("Failed to look at target");
+      memory.createEvent("command_executed", { 
+        command: `lookAt ${args.join(" ")}`, 
+        status: "failed", 
+        message: "Failed to look at target" 
+      });
+    }
+  }
+
   async drop(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length === 0) {
       bot.chat("Usage: drop <item_name> [quantity]");

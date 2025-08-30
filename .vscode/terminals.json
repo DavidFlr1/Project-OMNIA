@@ -27,8 +27,12 @@
       "description": "Terminal to execute the server",
       "color": "terminal.ansiCyan",
       "icon": "server-environment",
-      "commands": ["cd minecraft-server", "docker compose up --build"],
-      "recycle": true
+      "commands": ["cd minecraft-server"],
+      "recycle": true,
+      "_comments": {
+        "To run": "docker compose up --build",
+        "To stop": "docker compose down"
+      }
     },
     {
       "name": "Storage",
@@ -67,11 +71,14 @@
     {
       "name": "bot-1",
       "description": "Terminal to execute a bot agent",
-      "commands": ["cd bot", "npm run dev:agent botName=Bob subPort=1"],
+      "commands": ["cd bot", "npm run dev:agent botName=Bob subPort=1 env=dev"],
       "color": "terminal.ansiGreen",
       "icon": "robot",
       "execute": false,
-      "recycle": true
+      "recycle": true,
+      "_comments": {
+        "params": "botName=<name> subPort=<number> env=<dev|prod|local>"
+      }
     },
     {
       "name": "bot-logic-1",

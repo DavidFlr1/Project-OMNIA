@@ -155,6 +155,14 @@
         "status": true,
         "intent_keywords": ["equip", "wear", "hold", "wield", "use item"]
       },
+      "look_at": {
+        "syntax": "look_at <player | x> [y] [z]",
+        "args": "<player | x> [y] [z]",
+        "description": "Look at a player or coordinates",
+        "example": "look_at Steve or look_at 100 64 200",
+        "status": true,
+        "intent_keywords": ["look at", "look", "gaze", "stare", "observe"]
+      },
       "drop": {
         "syntax": "drop <item> [quantity]",
         "args": "<item> [quantity]",

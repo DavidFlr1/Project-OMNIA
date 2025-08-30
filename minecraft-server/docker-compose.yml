@@ -4,6 +4,7 @@ services:
     build: .
     ports:
       - "25565:25565"
+      - "2525:2525"  # For PlayerStreamer
     volumes:
       - ./world:/data/world     # persist local world
       - ./world/ops.json:/data/ops.json  # ensure ops file is in correct location

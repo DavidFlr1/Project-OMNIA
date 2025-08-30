@@ -10,7 +10,7 @@ async function main() {
   try {
     const params = parseArgs();
 
-    const MIN_HOST = process.env.MINECRAFT_HOST || "localhost";
+    const MIN_HOST = (process.env.ENV === "local" || params.env === "local") ? "localhost" : process.env.MINECRAFT_HOST || "localhost";
     const MIN_PORT = Number.parseInt(process.env.MINECRAFT_PORT || "25565");
     const botName = params.botName || process.env.MINECRAFT_USERNAME || "MinecraftBot";
     const botPass = params.botPass || process.env.MINECRAFT_PASSWORD || "";
