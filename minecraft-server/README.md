@@ -141,3 +141,13 @@ This server is designed to work with the OMNIA bot civilization project:
 
 - Enable F3 + H in-game to see block IDs for bot development
 - Use the commands in `misc/signs.txt` to create training areas for bots
+
+## Redeploy world backup to vm
+
+```bash ssh
+cd omnia/minecraft-server
+sudo docker compose -f docker-compose.prod.yml down
+sudo rm -rf world/
+sudo cp -r world-bu-<date_time>/ world/
+sudo docker compose -f docker-compose.prod.yml up -d
+```
