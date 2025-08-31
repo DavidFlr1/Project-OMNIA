@@ -24,10 +24,10 @@ jobs:
             
             # Stop containers first
             cd minecraft-server
-            docker compose -f docker-compose.prod.yml down || true
+            sudo docker compose -f docker-compose.prod.yml down || true
             cd ..
             
-            # Force clean with sudo for permission issues
+            # Force clean for permission issues
             sudo git reset --hard HEAD
             sudo git clean -fd
             
@@ -43,5 +43,5 @@ jobs:
             
             # Deploy
             cd minecraft-server
-            chmod +x deploy.sh
-            ./deploy.sh
+            sudo chmod +x deploy.sh
+            sudo ./deploy.sh
