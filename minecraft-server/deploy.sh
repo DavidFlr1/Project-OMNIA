@@ -6,8 +6,12 @@ echo "🚀 Deploying Minecraft Server..."
 # Stop existing containers first
 docker compose -f docker-compose.prod.yml down
 
-# Stash any local changes (runtime files)
-git stash push -m "Runtime files backup $(date)"
+# Force stash all changes including untracked files
+git add -A
+git stash push -u -m "Runtime files backup $(date)"
+
+# Reset any remaining conflicts
+git reset --hard HEAD
 
 # Pull latest changes
 git pull origin main
