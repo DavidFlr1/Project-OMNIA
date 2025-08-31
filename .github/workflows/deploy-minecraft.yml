@@ -37,7 +37,7 @@ jobs:
             echo ".env.example" >> .git/info/sparse-checkout
             echo "docker-compose.yml" >> .git/info/sparse-checkout
             echo "README.md" >> .git/info/sparse-checkout
-            
+
             # Pull latest changes
             git pull origin main
             

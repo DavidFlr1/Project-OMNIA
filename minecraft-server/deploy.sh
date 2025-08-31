@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Deploying Minecraft Server..."
+echo "🚀 Start: Deploying Minecraft Server..."
 
 # Stop existing containers first
 docker compose -f docker-compose.prod.yml down
