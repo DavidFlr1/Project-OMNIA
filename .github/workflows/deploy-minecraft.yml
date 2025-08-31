@@ -27,17 +27,17 @@ jobs:
             docker compose -f docker-compose.prod.yml down || true
             cd ..
             
-            # Force clean any local changes
-            git reset --hard HEAD
-            git clean -fd
+            # Force clean with sudo for permission issues
+            sudo git reset --hard HEAD
+            sudo git clean -fd
             
-            # Configure sparse-checkout
+            # Configure sparse-checkout (fix pattern)
             git config core.sparseCheckout true
-            echo "minecraft-server/*" > .git/info/sparse-checkout
+            echo "minecraft-server/" > .git/info/sparse-checkout
             echo ".env.example" >> .git/info/sparse-checkout
             echo "docker-compose.yml" >> .git/info/sparse-checkout
             echo "README.md" >> .git/info/sparse-checkout
-
+            
             # Pull latest changes
             git pull origin main
             
