@@ -21,11 +21,20 @@ jobs:
           key: ${{ secrets.GCP_VM_SSH_KEY }}
           script: |
             cd omnia
-            git sparse-checkout disable
-            git sparse-checkout set minecraft-server .env.example docker-compose.yml README.md
+            
+            # Stop containers first
+            cd minecraft-server
+            docker compose -f docker-compose.prod.yml down || true
+            cd ..
+            
+            # Force clean any local changes
+            git reset --hard HEAD
+            git clean -fd
+            
+            # Pull latest changes
             git pull origin main
+            
+            # Deploy
             cd minecraft-server
             chmod +x deploy.sh
             ./deploy.sh
-
-
