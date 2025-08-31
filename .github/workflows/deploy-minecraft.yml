@@ -21,7 +21,11 @@ jobs:
           key: ${{ secrets.GCP_VM_SSH_KEY }}
           script: |
             cd omnia
+            git sparse-checkout disable
             git sparse-checkout set minecraft-server .env.example docker-compose.yml README.md
             git pull origin main
             cd minecraft-server
+            chmod +x deploy.sh
             ./deploy.sh
+
+

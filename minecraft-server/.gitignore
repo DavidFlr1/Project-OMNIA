@@ -1,0 +1,25 @@
+# Runtime server files
+world/
+logs/
+crash-reports/
+*.log
+
+# Plugin runtime data
+plugins/.paper-remapped/
+plugins/*/cache/
+plugins/*/skins/
+plugins/*/locales/repository/
+plugins/*/recommendations.json
+plugins/update/
+
+# Server generated files
+banned-ips.json
+banned-players.json
+ops.json
+whitelist.json
+usercache.json
+usernamecache.json
+
+# Temporary files
+*.tmp
+*.lock
