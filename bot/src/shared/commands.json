@@ -39,7 +39,7 @@
         "description": "Stop all movement",
         "example": "stay",
         "status": true,
-        "intent_keywords": ["stay", "halt", "cease", "pause", "freeze"]
+        "intent_keywords": ["stay", "halt", "cease", "pause", "freeze", "stop"]
       }
     },
     "exploration": {
@@ -67,7 +67,7 @@
         "description": "Mine specific blocks with optional scouting",
         "example": "mine diamond_ore 3 32 true 5",
         "status": true,
-        "intent_keywords": ["mine", "dig", "extract", "harvest blocks", "collect blocks"]
+        "intent_keywords": ["mine", "dig", "extract", "harvest blocks", "collect blocks", "gather blocks", "pickaxe", "wood"]
       },
       "collect": {
         "syntax": "collect <item> [amount] [range]",
@@ -75,7 +75,7 @@
         "description": "Collect items from the ground",
         "example": "collect oak_planks 64 32",
         "status": true,
-        "intent_keywords": ["collect", "gather", "pick up", "retrieve", "grab"]
+        "intent_keywords": ["collect", "gather", "pick up", "retrieve", "grab", "find"]
       },
       "harvest": {
         "syntax": "harvest <crop> [quantity] [range]",
@@ -88,7 +88,7 @@
     },
     "building": {
       "place": {
-        "syntax": "place <(x y z)|(x1 y1 z1 x2 y2 z2)|[(x1 y1 z1), ..., (xN yN zN)]> <block> [invasive|non-invasive]",
+        "syntax": "place <x y z | x1 y1 z1 x2 y2 z2) | [x1 y1 z1, ..., xN yN zN]> <block> [invasive|non-invasive]",
         "args": "<position(s)> <block> [invasive|non-invasive]",
         "description": "Place blocks at specific positions",
         "example": "single 'place 10 64 10 stone invasive' or multiple 'place [10 64 10, 15 64 15, 20 64 20] stone non-invasive' or range 'place 10 64 10 15 64 15 stone non-invasive'",
@@ -196,17 +196,32 @@
         "intent_keywords": ["disable", "enable", "activate", "deactivate"]
       }
     },
-    "help": {
-      "help": {
-        "syntax": "help [category|command]",
-        "args": "[category|command]",
-        "description": "Show help information",
-        "example": "help mining",
+    "information": {
+      "players": {
+        "syntax": "players",
+        "args": "",
+        "description": "List online players",
+        "example": "players",
         "status": true,
-        "intent_keywords": ["commands", "usage", "guide", "manual"]
+        "intent_keywords": ["players", "online", "who", "list players"]
+      },
+      "entities": {
+        "syntax": "entities",
+        "args": "",
+        "description": "List nearby entities",
+        "example": "entities",
+        "status": true,
+        "intent_keywords": ["entities", "mobs", "nearby", "creatures"]
+      },
+      "config": {
+        "syntax": "config",
+        "args": "",
+        "description": "Show current configuration",
+        "example": "config",
+        "status": false,
+        "intent_keywords": ["config", "configuration", "settings", "setup"]
       }
     },
-
     "connection": {
       "connect": {
         "syntax": "connect",
@@ -243,32 +258,6 @@
         "intent_keywords": ["chat", "say", "speak", "message", "talk"]
       }
     },
-    "information": {
-      "players": {
-        "syntax": "players",
-        "args": "",
-        "description": "List online players",
-        "example": "players",
-        "status": true,
-        "intent_keywords": ["players", "online", "who", "list players"]
-      },
-      "entities": {
-        "syntax": "entities",
-        "args": "",
-        "description": "List nearby entities",
-        "example": "entities",
-        "status": true,
-        "intent_keywords": ["entities", "mobs", "nearby", "creatures"]
-      },
-      "config": {
-        "syntax": "config",
-        "args": "",
-        "description": "Show current configuration",
-        "example": "config",
-        "status": false,
-        "intent_keywords": ["config", "configuration", "settings", "setup"]
-      }
-    },
     "targeting": {
       "targeting": {
         "syntax": "targeting",
@@ -277,6 +266,17 @@
         "example": "targeting",
         "status": false,
         "intent_keywords": ["targeting", "control", "commands", "individual control"]
+      }
+    },
+
+    "help": {
+      "help": {
+        "syntax": "help [category|command]",
+        "args": "[category|command]",
+        "description": "Show help information",
+        "example": "help mining",
+        "status": true,
+        "intent_keywords": ["commands", "usage", "guide", "manual"]
       }
     }
   },

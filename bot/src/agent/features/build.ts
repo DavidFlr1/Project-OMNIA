@@ -105,8 +105,8 @@ export class BuildCommands {
 
     // Now args should only contain position information
 
-    // Check if we have array notation - join all position args and check if it starts with [ and ends with ]
-    const positionString = args.join(" ");
+    // Check if we have array notation - join all position args and check if it starts with [ and ends with ] and remove any `(` `)`
+    const positionString = args.join(" ").replace(/[\(\)]/g, "");
     if (positionString.trim().startsWith("[") && positionString.trim().endsWith("]")) {
       // Remove the brackets
       const positionsContent = positionString.trim().slice(1, -1);

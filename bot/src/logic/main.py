@@ -9,6 +9,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from subordinates.chat_manager import chat_manager
+from subordinates.intention_manager import intention_manager
+from subordinates.decision_manager import decision_manager
 
 # Load environment variables from .env file
 load_dotenv()
@@ -39,29 +41,41 @@ async def root():
 @app.post("/chat")
 async def handle_chat(request: Request):
     """
-    Handle chat requests from bot-agent and forward to fastapi-bridge
+    Handle chat requests with intelligent decision routing
     """
     try:
         data = await request.json()
         message = data.get("message", "")
         context = data.get("context", {})
-        # NEW: Extract username information
         player_username = data.get("player_username", "Player")
         bot_username = data.get("bot_username", "Bot")
         
         logger.info(f"Received chat request from {player_username} to {bot_username}: {message}")
         
-        # Forward to specialized chat manager
-        response = await chat_manager.handle_chat_message(
+        # Process through decision manager
+        result = await decision_manager.process_message(
             message, context, player_username, bot_username
         )
         
-        return {"response": response}
+        return {
+            "response": result["response"],
+            "action_type": result["action_type"],
+            "action_data": result.get("action_data", {}),
+            "success": result["success"]
+        }
         
     except Exception as e:
         logger.error(f"Error handling chat: {e}")
-        return {"response": "Sorry, I'm having trouble thinking right now."}
+        return {
+            "response": "Sorry, I'm having trouble thinking right now.",
+            "action_type": "chat",
+            "success": False
+        }
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+

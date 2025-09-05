@@ -186,7 +186,7 @@ export class Bot {
     // Process commands from chat (only if they start with ! and are targeted at this bot)
     if (message.startsWith("!")) {
       // Check if this command is targeted at this specific bot
-      if (this.interactionManager && this.interactionManager.shouldProcessCommand(message, username)) {
+      if (this.interactionManager) {
         logger.info(`Processing targeted command from ${username}: ${message}`);
         const command = this.extractCommand(message);
         if (command) {

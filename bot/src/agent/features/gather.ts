@@ -7,10 +7,10 @@ export class GatherCommands {
   async mine(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 2) {
       bot.chat("Usage: mine <block_type> <quantity_to_mine> [range] [scout] [scout_tries]");
-      memory.createEvent("command_executed", { 
-        command: `mine ${args.join(" ")}`, 
-        status: "invalid", 
-        message: "Invalid args. `Usage: mine <block_type> <quantity_to_mine> [range] [scout] [scout_tries]`" 
+      memory.createEvent("command_executed", {
+        command: `mine ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: mine <block_type> <quantity_to_mine> [range] [scout] [scout_tries]`",
       });
       return;
     }
@@ -46,7 +46,11 @@ export class GatherCommands {
         if (!block) {
           if (scout && tries < scoutTries) {
             bot.chat(`No ${blockType} found, scouting... (${tries + 1}/${scoutTries})`);
-            memory.createEvent("command_executed", { command: `mine ${args.join(" ")}`, status: "info", message: `No ${blockType} found, scouting... (${tries + 1}/${scoutTries})` });            // Move randomly to a nearby position
+            memory.createEvent("command_executed", {
+              command: `mine ${args.join(" ")}`,
+              status: "info",
+              message: `No ${blockType} found, scouting... (${tries + 1}/${scoutTries})`,
+            }); // Move randomly to a nearby position
             const offsetX = Math.floor(Math.random() * 10 - 5);
             const offsetZ = Math.floor(Math.random() * 10 - 5);
             const newPos = bot.entity.position.offset(offsetX, 0, offsetZ);
@@ -78,7 +82,11 @@ export class GatherCommands {
 
         mined++;
         bot.chat(`Mined ${mined}/${quantity} ${blockType}`);
-        memory.createEvent("command_executed", { command: `mine ${args.join(" ")}`, status: "info", message: `Mined ${mined}/${quantity} ${blockType}` });
+        memory.createEvent("command_executed", {
+          command: `mine ${args.join(" ")}`,
+          status: "info",
+          message: `Mined ${mined}/${quantity} ${blockType}`,
+        });
       }
 
       bot.chat(`Finished mining. Total mined: ${mined} ${blockType}`);
@@ -86,17 +94,21 @@ export class GatherCommands {
     } catch (error) {
       logger.error("Mining failed:", error);
       bot.chat("Mining failed");
-      memory.createEvent("command_executed", { command: `mine ${args.join(" ")}`, status: "failed", message: "Mining failed" });
+      memory.createEvent("command_executed", {
+        command: `mine ${args.join(" ")}`,
+        status: "failed",
+        message: "Mining failed",
+      });
     }
   }
 
   async collect(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 1) {
       bot.chat("Usage: collect <item_type> [amount] [range]");
-      memory.createEvent("command_executed", { 
-        command: `collect ${args.join(" ")}`, 
-        status: "invalid", 
-        message: "Invalid args. `Usage: collect <item_type> [amount] [range]`" 
+      memory.createEvent("command_executed", {
+        command: `collect ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: collect <item_type> [amount] [range]`",
       });
       return;
     }
@@ -109,38 +121,40 @@ export class GatherCommands {
     try {
       logger.info(`Collecting ${amount} ${itemType} from the ground within range ${range}`);
       bot.chat(`Looking for ${itemType} on the ground...`);
-      memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "info", message: `Looking for ${itemType} on the ground...` });
+      memory.createEvent("command_executed", {
+        command: `collect ${args.join(" ")}`,
+        status: "info",
+        message: `Looking for ${itemType} on the ground...`,
+      });
 
       // Get all entities
       const allEntities = Object.values(bot.entities);
-      
+
       // Filter entities by type and range
-      const matchingEntities = allEntities.filter(entity => {
+      const matchingEntities = allEntities.filter((entity) => {
         // Filter by entity type (both 'item' and 'other' can be dropped items)
-        if (entity.type !== 'object' && entity.name !== 'item') return false;
-        
+        if (entity.type !== "object" && entity.name !== "item") return false;
+
         // Filter by distance
         const distance = entity.position.distanceTo(bot.entity.position);
         if (distance > range) return false;
-        
+
         // Check if the entity's metadata contains the item we're looking for
         if (!entity.metadata) return false;
-        
+
         // Find the metadata entry with itemId
-        const itemMetadata: any = Object.values(entity.metadata).find(
-          (meta: any) => meta && meta.itemId !== undefined
-        );
-        
+        const itemMetadata: any = Object.values(entity.metadata).find((meta: any) => meta && meta.itemId !== undefined);
+
         if (!itemMetadata) return false;
-        
+
         // Get the item from registry using itemId
         const registryItem = bot.registry.items[itemMetadata?.itemId];
         if (!registryItem) return false;
-        
+
         // Check if the item name or displayName matches what we're looking for
-        const itemName = registryItem.name?.toLowerCase() || '';
-        const displayName = registryItem.displayName?.toLowerCase() || '';
-        
+        const itemName = registryItem.name?.toLowerCase() || "";
+        const displayName = registryItem.displayName?.toLowerCase() || "";
+
         return itemName.includes(itemType) || displayName.includes(itemType);
       });
 
@@ -151,38 +165,54 @@ export class GatherCommands {
       }
 
       bot.chat(`Found ${matchingEntities.length} ${itemType} on the ground`);
-      memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "info", message: `Found ${matchingEntities.length} ${itemType} on the ground` });
-      
+      memory.createEvent("command_executed", {
+        command: `collect ${args.join(" ")}`,
+        status: "info",
+        message: `Found ${matchingEntities.length} ${itemType} on the ground`,
+      });
+
       // Sort by distance to prioritize closest items
-      matchingEntities.sort((a, b) => 
-        a.position.distanceTo(bot.entity.position) - b.position.distanceTo(bot.entity.position)
+      matchingEntities.sort(
+        (a, b) => a.position.distanceTo(bot.entity.position) - b.position.distanceTo(bot.entity.position)
       );
-      
+
       let collected = 0;
       for (const entity of matchingEntities.slice(0, amount)) {
         try {
           logger.info(`Moving to collect item at ${JSON.stringify(entity.position)}`);
-          memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "info", message: `Moving to collect item at ${JSON.stringify(entity.position)}` });
-          
+          memory.createEvent("command_executed", {
+            command: `collect ${args.join(" ")}`,
+            status: "info",
+            message: `Moving to collect item at ${JSON.stringify(entity.position)}`,
+          });
+
           // Move to the item
           const goal = new goals.GoalNear(entity.position.x, entity.position.y, entity.position.z, 1);
           await bot.pathfinder.goto(goal);
-          
+
           // Wait a moment to pick up the item (happens automatically when close enough)
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           // Check if the entity still exists (if not, we probably collected it)
           if (!bot.entities[entity.id]) {
             collected++;
             bot.chat(`Collected ${collected}/${amount} ${itemType}`);
-            memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "info", message: `Collected ${collected}/${amount} ${itemType}` });
+            memory.createEvent("command_executed", {
+              command: `collect ${args.join(" ")}`,
+              status: "info",
+              message: `Collected ${collected}/${amount} ${itemType}`,
+            });
           }
-          
+
           // If we've collected enough, stop
           if (collected >= amount) break;
         } catch (error) {
           logger.warn(`Failed to collect item at ${entity.position}:`, error);
-          memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "failed", message: `Failed to collect item at ${entity.position}` });
+          memory.createEvent("command_executed", {
+            command: `collect ${args.join(" ")}`,
+            status: "failed",
+            message: `Failed to collect item at ${entity.position}`,
+          });
         }
       }
 
@@ -192,17 +222,21 @@ export class GatherCommands {
     } catch (error) {
       logger.error("Collection failed:", error);
       bot.chat("Collection failed");
-      memory.createEvent("command_executed", { command: `collect ${args.join(" ")}`, status: "failed", message: "Collection failed" });
+      memory.createEvent("command_executed", {
+        command: `collect ${args.join(" ")}`,
+        status: "failed",
+        message: "Collection failed",
+      });
     }
   }
 
   async harvest(bot: MineflayerBot, args: string[], memory: Memory): Promise<void> {
     if (args.length < 1) {
       bot.chat("Usage: harvest <crop_type> [quantity] [range]");
-      memory.createEvent("command_executed", { 
-        command: `harvest ${args.join(" ")}`, 
-        status: "invalid", 
-        message: "Invalid args. `Usage: harvest <crop_type> [quantity] [range]`" 
+      memory.createEvent("command_executed", {
+        command: `harvest ${args.join(" ")}`,
+        status: "invalid",
+        message: "Invalid args. `Usage: harvest <crop_type> [quantity] [range]`",
       });
       return;
     }
@@ -211,24 +245,28 @@ export class GatherCommands {
     memory.createEvent("command_executed", { command: `harvest ${args.join(" ")}`, status: "in_progress" });
     let cropType = args[0];
     const cropMappings: Record<string, string> = {
-      "carrot": "carrots",
-      "potato": "potatoes",
-      "beetroot": "beetroots",
-      "wheat": "wheat",
+      carrot: "carrots",
+      potato: "potatoes",
+      beetroot: "beetroots",
+      wheat: "wheat",
     };
-    
+
     // Check if we need to convert from singular to plural
     if (cropMappings[cropType]) {
       cropType = cropMappings[cropType];
     }
-    
+
     const quantity = args[1] ? parseInt(args[1]) : 10;
     const range = args[2] ? parseInt(args[2]) : 32;
 
     try {
       logger.info(`Harvesting ${cropType} within range ${range}`);
       bot.chat(`Harvesting ${cropType}...`);
-      memory.createEvent("command_executed", { command: `harvest ${args.join(" ")}`, status: "info", message: `Harvesting ${cropType}...` });
+      memory.createEvent("command_executed", {
+        command: `harvest ${args.join(" ")}`,
+        status: "info",
+        message: `Harvesting ${cropType}...`,
+      });
 
       const crops = bot.findBlocks({
         matching: (block) => {
@@ -257,7 +295,11 @@ export class GatherCommands {
           }
         } catch (error) {
           logger.warn(`Failed to harvest crop at ${cropPos}:`, error);
-          memory.createEvent("command_executed", { command: `harvest ${args.join(" ")}`, status: "failed", message: `Failed to harvest crop at ${cropPos}` });
+          memory.createEvent("command_executed", {
+            command: `harvest ${args.join(" ")}`,
+            status: "failed",
+            message: `Failed to harvest crop at ${cropPos}`,
+          });
         }
       }
 
@@ -267,7 +309,11 @@ export class GatherCommands {
     } catch (error) {
       logger.error("Harvesting failed:", error);
       bot.chat("Harvesting failed");
-      memory.createEvent("command_executed", { command: `harvest ${args.join(" ")}`, status: "failed", message: "Harvesting failed" });
+      memory.createEvent("command_executed", {
+        command: `harvest ${args.join(" ")}`,
+        status: "failed",
+        message: "Harvesting failed",
+      });
     }
   }
 

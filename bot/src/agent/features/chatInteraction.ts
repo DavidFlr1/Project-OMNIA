@@ -5,7 +5,6 @@ import {
   logger,
   getNearbyPlayers,
   getInventoryItems,
-  getNearbyBots,
   getCurrentActivity,
 } from "../utils";
 import type { Memory } from "../core/memory";
@@ -35,7 +34,6 @@ export class InteractionManager {
       lastInteraction: 0,
       lookTimeout: null,
     };
-
 
     this.setupEventHandlers();
   }
@@ -67,7 +65,7 @@ export class InteractionManager {
 
     // Check if this is a targeted command
     if (message.startsWith("!")) {
-      // Command handling is delegated to the Bot class via shouldProcessCommand
+      // Command handling is delegated to the Bot class
       return;
     } else {
       // For regular chat, check if player is nearby and looking at the bot
@@ -85,56 +83,6 @@ export class InteractionManager {
       isNearby,
       isLooking,
     });
-  }
-
-  // Public method to check if command should be processed
-  public shouldProcessCommand(message: string, username: string): boolean {
-    if (!message.startsWith("!")) return false;
-
-    const player = this.bot.players[username];
-    if (!player || !player.entity) return false;
-
-    const isNearby = isPlayerNearby(player.entity, this.bot.entity, 8); // Slightly larger range for commands
-    const isLooking = isLookingAtBot(player.entity, this.bot.entity, 0.7); // More lenient for commands
-
-    return this.isCommandTargetedAtThisBot(message, username, isNearby, isLooking);
-  }
-
-  private isCommandTargetedAtThisBot(
-    message: string,
-    username: string,
-    isNearby: boolean,
-    isLooking: boolean
-  ): boolean {
-    const botName = this.bot.username.toLowerCase();
-    const messageLower = message.toLowerCase();
-
-    // Method 1: Direct name targeting - "@BotName !command" or "!BotName command"
-    if (messageLower.includes(`@${botName}`) || messageLower.startsWith(`!${botName}`)) {
-      logger.debug(`Command directly targeted at ${botName}`);
-      return true;
-    }
-
-    // Method 2: Proximity + eye contact targeting (most intuitive)
-    if (isNearby && isLooking) {
-      logger.debug(`Command targeted via proximity and eye contact to ${botName}`);
-      return true;
-    }
-
-    // Method 3: Check if message contains bot name anywhere
-    if (messageLower.includes(botName)) {
-      logger.debug(`Command contains bot name ${botName}`);
-      return true;
-    }
-
-    // Method 4: If no other bots are nearby, assume it's for this bot
-    const nearbyBots = getNearbyBots(this.bot, username);
-    if (nearbyBots.length === 1 && nearbyBots[0] === botName) {
-      logger.debug(`Only bot nearby, assuming command is for ${botName}`);
-      return true;
-    }
-
-    return false;
   }
 
   // Conversation
@@ -158,7 +106,7 @@ export class InteractionManager {
 
       // Store response in memory
       this.memory.createEvent("chat_message", {
-        event: 'bot_response',
+        event: "bot_response",
         username,
         message,
         response,
@@ -167,10 +115,11 @@ export class InteractionManager {
     }
   }
 
-  private async getAIResponse(username: string, message: string): Promise<string | null> {
+  private async generateResponse(username: string, message: string): Promise<string | null> {
     try {
       const port = 4000 + Number(this.subPort || 1);
-      const botLogicUrl = `${process.env.BOT_LOGIC_HOST}:${port || process.env.BOT_LOGIC_PORT}` || "http://localhost:4001";
+      const botLogicUrl =
+        `${process.env.BOT_LOGIC_HOST}:${port || process.env.BOT_LOGIC_PORT}` || "http://localhost:4001";
 
       // Get bot context for the AI
       const context = {
@@ -200,8 +149,10 @@ export class InteractionManager {
         }),
       });
 
+      
       if (response.ok) {
-        const data = (await response.json()) as { response: string };
+        const data = (await response.json()) as { response: string; action: string };
+
         return data.response;
       } else {
         logger.warn(`Bot logic service returned ${response.status}`);
@@ -211,31 +162,6 @@ export class InteractionManager {
       logger.warn("Failed to get AI response:", error);
       return null;
     }
-  }
-
-  private async generateResponse(username: string, message: string): Promise<string | null> {
-    // Try to get AI response first
-    const aiResponse = await this.getAIResponse(username, message);
-    if (aiResponse) {
-      return aiResponse;
-    }
-
-    // Fallback to hardcoded responses
-    const lowerMessage = message.toLowerCase();
-
-    if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
-      return `Hello ${username}!`;
-    }
-
-    if (lowerMessage.includes("help")) {
-      return "I can help with basic tasks. Try asking me to follow you or explore an area using commands!";
-    }
-
-    if (lowerMessage.includes("bye") || lowerMessage.includes("goodbye")) {
-      return `See you later, ${username}!`;
-    }
-
-    return "I am sorry, I couldn't generate a response to that.";
   }
 
   // Player looking handling

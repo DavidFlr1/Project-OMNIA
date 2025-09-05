@@ -5,7 +5,7 @@ Handles LLM integration and RAG capabilities
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import decision, memory, status
+from app.routes import memory, status
 
 app = FastAPI(title="FastAPI Bridge", version="1.0.0")
 
@@ -19,7 +19,6 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(decision.router, prefix="/api/v1")
 app.include_router(memory.router, prefix="/api/v1")
 app.include_router(status.router, prefix="/api/v1")
 
