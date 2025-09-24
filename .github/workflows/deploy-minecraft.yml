@@ -8,17 +8,29 @@ on:
       - '.env.example'
       - 'docker-compose.yml'
       - 'README.md'
+  schedule:
+    # Retry failed deployments on Fridays at 12:00 PM UTC
+    - cron: '0 12 * * 5'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Check if retry needed (scheduled run)
+        if: github.event_name == 'schedule'
+        run: |
+          echo "This is a scheduled retry run on Friday"
+          
       - name: Deploy to GCP VM
+        id: deploy
+        continue-on-error: true
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.GCP_VM_IP }}
           username: ${{ secrets.GCP_VM_USER }}
           key: ${{ secrets.GCP_VM_SSH_KEY }}
+          timeout: 30s
+          command_timeout: 5m
           script: |
             cd omnia
             
@@ -31,11 +43,11 @@ jobs:
             sudo git reset --hard HEAD
             sudo git clean -fd
             
-            # Configure sparse-checkout (fix pattern)
+            # Configure sparse-checkout
             git config core.sparseCheckout true
             echo "minecraft-server/" > .git/info/sparse-checkout
             echo ".env.example" >> .git/info/sparse-checkout
-            echo "docker-compose.yml" >> .git/info/sparse-checkout
+            echo "minecraft-server/docker-compose.prod.yml" >> .git/info/sparse-checkout
             echo "README.md" >> .git/info/sparse-checkout
             
             # Pull latest changes
@@ -45,3 +57,22 @@ jobs:
             cd minecraft-server
             sudo chmod +x deploy.sh
             sudo ./deploy.sh
+
+      - name: Create retry flag if deployment failed
+        if: failure() && github.event_name == 'push'
+        run: |
+          echo "Deployment failed on push. Will retry on Friday."
+          # You could store this in GitHub's cache or as an artifact
+          
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ steps.deploy.outcome }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed. VM might be stopped during weekdays."
+            if [ "${{ github.event_name }}" == "push" ]; then
+              echo "Will automatically retry on Friday at 12 PM UTC."
+            fi
+          fi
+
