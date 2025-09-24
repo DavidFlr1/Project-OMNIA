@@ -19,7 +19,7 @@ class CommandManager:
     
     def __init__(self):
         self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.bot_api_port = os.getenv("API_PORT", "3001")
+        self.bot_api_port = os.getenv("AGENT_PORT", "3001")
         self.commands_data = self._load_commands()
         logger.info("CommandManager initialized with LLM integration")
     

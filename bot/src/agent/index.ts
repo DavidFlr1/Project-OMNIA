@@ -9,8 +9,9 @@ dotenv.config({ path: "../.env" });
 async function main() {
   try {
     const params = parseArgs();
+    const env = params.env || process.env.ENV || "local";
 
-    const MIN_HOST = (process.env.ENV === "local" || params.env === "local") ? "localhost" : process.env.MINECRAFT_HOST || "localhost";
+    const MIN_HOST = params.network || (env === "local" ? "localhost" : process.env.MINECRAFT_HOST || "localhost");
     const MIN_PORT = Number.parseInt(process.env.MINECRAFT_PORT || "25565");
     const botName = params.botName || process.env.MINECRAFT_USERNAME || "MinecraftBot";
     const botPass = params.botPass || process.env.MINECRAFT_PASSWORD || "";
@@ -21,7 +22,7 @@ async function main() {
     logger.info("Starting Minecraft Bot Agent...");
 
     // Show configuration
-    logger.info(`Bot configuration: Host=${MIN_HOST}, Port=${MIN_PORT}, Username=${botName}, SubPort=${subPort}`);
+    logger.info(`Bot configuration: Host=${MIN_HOST}, Port=${MIN_PORT}, Username=${botName}, SubPort=${subPort}, ENV=${env}`);
 
     // Initialize bot
     const bot = new Bot({
@@ -74,7 +75,7 @@ function parseArgs() {
   const params: Record<string, string> = {}; 
 
   args.forEach(arg => {
-    const [key, value] = arg.split('=');
+    const [key, value] = (arg.replaceAll("\\", "")).split('=');
     if (key && value) {
       params[key] = value;
     }

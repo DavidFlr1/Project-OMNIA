@@ -7,7 +7,7 @@ export function createBotRouter(bot: Bot): express.Router {
 
   // Bot status endpoint
   router.get("/status", (_, res) => {
-    res.json(bot.agent.getStatus());
+    return res.json(bot.agent?.getStatus());
   });
 
   // Execute command endpoint
@@ -24,10 +24,10 @@ export function createBotRouter(bot: Bot): express.Router {
       }
 
       await bot.executeCommand(command);
-      res.json({ success: true, command });
+      return res.json({ success: true, command });
     } catch (error) {
       logger.error("API command execution failed:", error);
-      res.status(500).json({
+      return res.status(500).json({
         error: "Command execution failed",
         message: error instanceof Error ? error.message : "Unknown error",
       });
@@ -47,7 +47,7 @@ export function createBotRouter(bot: Bot): express.Router {
       return acc;
     }, {} as Record<string, number>);
 
-    res.json({ inventory, totalItems: items.length, raw: items });
+    return res.json({ inventory, totalItems: items.length, raw: items });
   });
 
   // Get nearby entities
@@ -74,7 +74,7 @@ export function createBotRouter(bot: Bot): express.Router {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 20); // Limit to 20 nearest entities
 
-    res.json({ entities, count: entities.length });
+    return res.json({ entities, count: entities.length });
   });
 
   return router;

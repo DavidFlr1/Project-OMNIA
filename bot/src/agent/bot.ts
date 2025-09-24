@@ -133,11 +133,13 @@ export class Bot {
     // });
 
     this.bot.on("playerJoined", (player) => {
+      if (player.username !== this.bot?.username) return;
       logger.info(`Player joined: ${player.username}`);
       this.memory.createEvent("system_event", { event: 'player_joined', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
     });
 
     this.bot.on("playerLeft", (player) => {
+      if (player.username !== this.bot?.username) return;
       logger.info(`Player left: ${player.username}`);
       this.memory.createEvent("system_event", { event: 'player_left', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
 

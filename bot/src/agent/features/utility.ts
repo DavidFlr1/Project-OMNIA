@@ -32,30 +32,30 @@ export class UtilityCommands {
       // Show activity status safely
       await new Promise((resolve) => setTimeout(resolve, 300));
       try {
-        const activities = [];
+        // const activities = [];
 
-        if (this.moveCommands.isActive()) {
-          const moveStatus = this.moveCommands.getStatus();
-          if (moveStatus.following && moveStatus.followTarget) {
-            activities.push(`Following ${moveStatus.followTarget}`);
-          }
-          if (moveStatus.patrolling) {
-            activities.push("Patrolling");
-          }
-        }
+        // if (this.moveCommands.isActive()) {
+        //   const moveStatus = this.moveCommands.getStatus();
+        //   if (moveStatus.following && moveStatus.followTarget) {
+        //     activities.push(`Following ${moveStatus.followTarget}`);
+        //   }
+        //   if (moveStatus.patrolling) {
+        //     activities.push("Patrolling");
+        //   }
+        // }
 
-        if (this.gatherCommands.isActive()) {
-          const gatherStatus = this.gatherCommands.getStatus();
-          if (gatherStatus.mining) activities.push("Mining");
-          if (gatherStatus.collecting) activities.push("Collecting");
-        }
+        // if (this.gatherCommands.isActive()) {
+        //   const gatherStatus = this.gatherCommands.getStatus();
+        //   if (gatherStatus.mining) activities.push("Mining");
+        //   if (gatherStatus.collecting) activities.push("Collecting");
+        // }
 
-        if (this.exploreCommands.isActive()) {
-          activities.push("Exploring");
-        }
+        // if (this.exploreCommands.isActive()) {
+        //   activities.push("Exploring");
+        // }
 
-        const activityText = activities.length > 0 ? activities.join(", ") : "Idle";
-        bot.chat(`Activities: ${activityText}`);
+        // const activityText = activities.length > 0 ? activities.join(", ") : "Idle";
+        // bot.chat(`Activities: ${activityText}`);
         memory.createEvent("command_executed", { command: "status", status: "completed" });
       } catch (activityError) {
         logger.warn("Error getting activity status:", activityError);

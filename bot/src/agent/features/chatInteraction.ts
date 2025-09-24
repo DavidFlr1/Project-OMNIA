@@ -118,8 +118,7 @@ export class InteractionManager {
   private async generateResponse(username: string, message: string): Promise<string | null> {
     try {
       const port = 4000 + Number(this.subPort || 1);
-      const botLogicUrl =
-        `${process.env.BOT_LOGIC_HOST}:${port || process.env.BOT_LOGIC_PORT}` || "http://localhost:4001";
+      const botLogicUrl = `${process.env.BOT_HOST || "http://localhost"}:${port || process.env.LOGIC_PORT || 4001}`;
 
       // Get bot context for the AI
       const context = {
@@ -149,7 +148,6 @@ export class InteractionManager {
         }),
       });
 
-      
       if (response.ok) {
         const data = (await response.json()) as { response: string; action: string };
 

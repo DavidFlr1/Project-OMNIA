@@ -1,0 +1,63 @@
+{
+  "limit": 3,
+  "limitPerNode": 5,
+  "limitOfInstances": 4,
+  "launchWaitTime": 5000,
+  "version": "1.21.0",
+  "environment": "local",
+  "resourceLimits": {
+    "maxMemoryMB": 1024,
+    "maxCpuPercent": 80,
+    "alertThreshold": 800
+  },
+  "bots": [
+    {
+      "username": "Bob",
+      "subPort": 1,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Tod",
+      "subPort": 2,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Alice",
+      "subPort": 3,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Toder",
+      "subPort": 4,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Eve",
+      "subPort": 5,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Mallory",
+      "subPort": 6,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Trent",
+      "subPort": 7,
+      "password": "",
+      "id": 1
+    },
+    {
+      "username": "Wes",
+      "subPort": 8,
+      "password": "",
+      "id": 1
+    }
+  ]
+}

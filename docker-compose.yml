@@ -19,10 +19,10 @@ services:
       - MINECRAFT_PORT=25565
       - MINECRAFT_USERNAME=MinecraftBot
       - MINECRAFT_PASSWORD=${MINECRAFT_PASSWORD:-}
-      - API_PORT=3001
+      - AGENT_PORT=3001
       - API_HOST=0.0.0.0
-      - BOT_LOGIC_PORT=4001
-      - BOT_LOGIC_HOST=http://localhost
+      - LOGIC_PORT=4001
+      - BOT_HOST=http://0.0.0.0
       - GOVERNOR_URL=http://governor:5000
       - STORAGE_SERVICE_URL=http://storage-service:8000/api/v1
       - REDIS_URL=redis://redis:6379

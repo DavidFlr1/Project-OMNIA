@@ -21,10 +21,10 @@ export function createChatRouter(bot: Bot): express.Router {
 
       botInstance.chat(message);
       logger.info(`SERVER CHAT HIT: ${message}`);
-      res.json({ success: true, message });
+      return res.json({ success: true, message });
     } catch (error) {
       logger.error("API chat failed:", error);
-      res.status(500).json({
+      return res.status(500).json({
         error: "Chat failed",
         message: error instanceof Error ? error.message : "Unknown error",
       });
