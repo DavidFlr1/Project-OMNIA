@@ -1,4 +1,4 @@
-# version: "3.8"
+name: omnia
 services:
   mc:
     build: .
@@ -12,7 +12,7 @@ services:
       - MEMORY=6G
       # - ENV=${ENV:-dev}
     networks:
-      minecraft-network:
+      omnia-network:
         # ipv4_address: 172.19.0.10
     deploy:
       resources:
@@ -24,7 +24,7 @@ services:
           cpus: '0.5'
 
 networks:
-  minecraft-network:
+  omnia-network:
     driver: bridge
 #     ipam:
 #       config:

@@ -125,12 +125,12 @@ export class Bot {
     });
     
     // System events per thick
-    // this.bot.on("physicsTick", () => {
-    //   // Update status every 3 seconds
-    //   if (Date.now() - this.agent?.getStatus()?.timestamp > 3000) {
-    //     this.agent?.updateStatus({}, false);
-    //   }
-    // });
+    this.bot.on("physicsTick", () => {
+      // Update status every 60 seconds
+      if (Date.now() - (this.agent?.getStatus()?.timestamp || 0) > 60000) {
+        this.agent?.updateStatus({}, false);
+      }
+    });
 
     this.bot.on("playerJoined", (player) => {
       if (player.username !== this.bot?.username) return;
@@ -140,6 +140,7 @@ export class Bot {
 
     this.bot.on("playerLeft", (player) => {
       if (player.username !== this.bot?.username) return;
+      this.agent?.updateStatus({}, true);
       logger.info(`Player left: ${player.username}`);
       this.memory.createEvent("system_event", { event: 'player_left', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
 
@@ -157,6 +158,7 @@ export class Bot {
 
       if (health < 10) {
         logger.warn("Low health detected");
+        this.agent?.updateStatus({}, false);
         this.memory.createEvent("bot_log", { event: 'low_health', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
       }
     });
@@ -174,6 +176,7 @@ export class Bot {
 
     this.bot.on("end", () => {
       logger.info("Bot disconnected");
+      this.agent?.updateStatus({}, true);
       this.memory.createEvent("system_event", { event: 'bot_stopped', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
       this.isConnected = false;
     });

@@ -11,8 +11,8 @@ services:
     environment:
       - MEMORY=6G
     networks:
-      - minecraft-network
+      - omnia-network
 
 networks:
-  minecraft-network:
+  omnia-network:
     driver: bridge

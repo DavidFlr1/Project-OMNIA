@@ -1,63 +1,93 @@
 {
   "limit": 3,
-  "limitPerNode": 5,
-  "limitOfInstances": 4,
-  "launchWaitTime": 5000,
-  "version": "1.21.0",
   "environment": "local",
+  "deployment": {
+    "project": "omnia",
+    "botGroup": "mc-bots",
+    "network": "omnia-mc-1",
+    "behavior": "overwrite",
+    "launchWaitTime": 0
+  },
   "resourceLimits": {
     "maxMemoryMB": 1024,
     "maxCpuPercent": 80,
-    "alertThreshold": 800
+    "alertThreshold": 800,
+    "maxInstances": 4,
+    "maxBotsPerInstance": 5
+  },
+  "meta": {
+    "version": "1.0.0",
+    "mc-version": "1.21.0",
+    "last_updated": "2024-01-01",
+    "total_bots": 8,
+    "_comments": [
+      "behavior: overwrite | append | bot | destroy"
+    ]
   },
   "bots": [
     {
       "username": "Bob",
       "subPort": 1,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Tod",
       "subPort": 2,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Alice",
       "subPort": 3,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Toder",
       "subPort": 4,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Eve",
       "subPort": 5,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Mallory",
       "subPort": 6,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Trent",
       "subPort": 7,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     },
     {
       "username": "Wes",
       "subPort": 8,
       "password": "",
-      "id": 1
+      "deployment": {
+        "behavior": "overwrite"
+      } 
     }
   ]
 }

@@ -90,7 +90,7 @@ export class Agent {
   
       const state = { ...this.memory?.agentMemory?.data, ...status, ...newState };
       this.memory.updateAgentState(state);
-      log && logger.debug("Agent state updated:", state);
+      log && logger.info("Agent state updated:", state);
     } catch (error) {
       logger.error("Failed to update agent state:", error);
     }

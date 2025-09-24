@@ -1,0 +1,23 @@
+name: omnia
+services:
+  storage-service:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - omnia-network
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - omnia-network
+
+networks:
+  omnia-network:
+    driver: bridge

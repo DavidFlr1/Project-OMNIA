@@ -1,0 +1,101 @@
+name: mc-bots
+networks:
+  omnia_omnia-network:
+    external: true
+services:
+  alice-3:
+    build: .
+    command:
+    - npm
+    - run
+    - dev:combined
+    - --
+    - botName=Alice
+    - subPort=3
+    - env=local
+    - network=omnia-mc-1
+    container_name: alice-3
+    env_file: ../.env
+    environment:
+    - MINECRAFT_USERNAME=Alice
+    - MINECRAFT_PASSWORD=
+    - AGENT_PORT=3003
+    - LOGIC_PORT=4003
+    - BOT_HOST=http://0.0.0.0
+    - SUBPORT=3
+    - ENV=local
+    - MINECRAFT_HOST=omnia-mc-1
+    - STORAGE_SERVICE_URL=http://omnia-storage-service-1:8000/api/v1
+    labels:
+    - project=omnia
+    - bot.username=Alice
+    - bot.subport=3
+    networks:
+    - omnia_omnia-network
+    ports:
+    - 3003:3003
+    - 4003:4003
+  bob-1:
+    build: .
+    command:
+    - npm
+    - run
+    - dev:combined
+    - --
+    - botName=Bob
+    - subPort=1
+    - env=local
+    - network=omnia-mc-1
+    container_name: bob-1
+    env_file: ../.env
+    environment:
+    - MINECRAFT_USERNAME=Bob
+    - MINECRAFT_PASSWORD=
+    - AGENT_PORT=3001
+    - LOGIC_PORT=4001
+    - BOT_HOST=http://0.0.0.0
+    - SUBPORT=1
+    - ENV=local
+    - MINECRAFT_HOST=omnia-mc-1
+    - STORAGE_SERVICE_URL=http://omnia-storage-service-1:8000/api/v1
+    labels:
+    - project=omnia
+    - bot.username=Bob
+    - bot.subport=1
+    networks:
+    - omnia_omnia-network
+    ports:
+    - 3001:3001
+    - 4001:4001
+  tod-2:
+    build: .
+    command:
+    - npm
+    - run
+    - dev:combined
+    - --
+    - botName=Tod
+    - subPort=2
+    - env=local
+    - network=omnia-mc-1
+    container_name: tod-2
+    env_file: ../.env
+    environment:
+    - MINECRAFT_USERNAME=Tod
+    - MINECRAFT_PASSWORD=
+    - AGENT_PORT=3002
+    - LOGIC_PORT=4002
+    - BOT_HOST=http://0.0.0.0
+    - SUBPORT=2
+    - ENV=local
+    - MINECRAFT_HOST=omnia-mc-1
+    - STORAGE_SERVICE_URL=http://omnia-storage-service-1:8000/api/v1
+    labels:
+    - project=omnia
+    - bot.username=Tod
+    - bot.subport=2
+    networks:
+    - omnia_omnia-network
+    ports:
+    - 3002:3002
+    - 4002:4002
