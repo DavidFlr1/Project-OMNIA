@@ -200,12 +200,13 @@ export class Bot {
       } else {
         logger.debug(`Command not targeted at this bot (${this.bot!.username})`);
       }
-    } else {
+    } 
+    if(type === 'whisper') {
       // Store chat message in memory
-      // this.memory.createEvent("chat_message", {
-      //   username,
-      //   message,
-      // });
+      this.memory.createEvent("chat_message", {
+        username,
+        message,
+      });
     }
   }
 

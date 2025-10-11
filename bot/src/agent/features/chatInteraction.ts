@@ -70,19 +70,20 @@ export class InteractionManager {
     } else {
       // For regular chat, check if player is nearby and looking at the bot
       if (isNearby && isLooking) {
+        // Store interaction in memory
+        this.memory.createEvent("chat_message", {
+          username,
+          message,
+          distance,
+          isNearby,
+          isLooking,
+        });
+        
         await this.respondToPlayer(username, message);
         this.startLookingAtPlayer(username);
+
       }
     }
-
-    // Store interaction in memory
-    this.memory.createEvent("chat_message", {
-      username,
-      message,
-      distance,
-      isNearby,
-      isLooking,
-    });
   }
 
   // Conversation
