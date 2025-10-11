@@ -57,7 +57,7 @@ export class Bot {
       this.bot.loadPlugin(collectBlock);
       this.bot.loadPlugin(pvp);
 
-      
+
       // Set up event handlers
       this.setupEventHandlers();
 
@@ -109,12 +109,12 @@ export class Bot {
   private setupEventHandlers(): void {
     if (!this.bot) return;
 
-    this.bot.on('whisper', (username, message) => {
+    this.bot.on("whisper", (username, message) => {
       if (username === this.bot!.username) return;
       logger.info(`Whisper: <${username}> ${message}`);
-      
+
       this.chatHandler(username, message, "whisper");
-    })
+    });
 
     this.bot.on("chat", (username, message) => {
       if (username === this.bot!.username) return;
@@ -123,7 +123,7 @@ export class Bot {
       this.chatHandler(username, message, "chat");
       // Note: Interaction manager handles regular chat for conversations
     });
-    
+
     // System events per thick
     this.bot.on("physicsTick", () => {
       // Update status every 60 seconds
@@ -135,14 +135,20 @@ export class Bot {
     this.bot.on("playerJoined", (player) => {
       if (player.username !== this.bot?.username) return;
       logger.info(`Player joined: ${player.username}`);
-      this.memory.createEvent("system_event", { event: 'player_joined', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "player_joined",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
     });
 
     this.bot.on("playerLeft", (player) => {
       if (player.username !== this.bot?.username) return;
       this.agent?.updateStatus({}, true);
       logger.info(`Player left: ${player.username}`);
-      this.memory.createEvent("system_event", { event: 'player_left', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "player_left",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
 
       // Stop looking at player if they left
       if (this.interactionManager) {
@@ -154,36 +160,50 @@ export class Bot {
       const health = this.bot!.health;
       const food = this.bot!.food;
       logger.debug(`Health: ${health}, Food: ${food}`);
-      
 
       if (health < 10) {
         logger.warn("Low health detected");
         this.agent?.updateStatus({}, false);
-        this.memory.createEvent("bot_log", { event: 'low_health', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+        this.memory.createEvent("bot_log", {
+          event: "low_health",
+          metadata: { username: this.bot?.username, subPort: this.config.subPort },
+        });
       }
     });
 
     this.bot.on("death", () => {
       logger.warn("Bot died");
-      this.memory.createEvent("system_event", { event: 'death', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "death",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
     });
 
     this.bot.on("kicked", (reason) => {
       logger.error(`Bot was kicked: ${JSON.stringify(reason, null, 2)}`);
-      this.memory.createEvent("system_event", { event: 'kicked', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "kicked",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
       this.isConnected = false;
     });
 
     this.bot.on("end", () => {
       logger.info("Bot disconnected");
       this.agent?.updateStatus({}, true);
-      this.memory.createEvent("system_event", { event: 'bot_stopped', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "bot_stopped",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
       this.isConnected = false;
     });
 
     this.bot.on("error", (error) => {
       logger.error("Bot error:", JSON.stringify(error, null, 2));
-      this.memory.createEvent("system_event", { event: 'bot_error', metadata: { username: this.bot?.username, subPort: this.config.subPort } });
+      this.memory.createEvent("system_event", {
+        event: "bot_error",
+        metadata: { username: this.bot?.username, subPort: this.config.subPort },
+      });
     });
   }
 
@@ -200,10 +220,10 @@ export class Bot {
       } else {
         logger.debug(`Command not targeted at this bot (${this.bot!.username})`);
       }
-    } 
-    if(type === 'whisper') {
+    }
+    if (type === "whisper") {
       // Store chat message in memory
-      this.memory.createEvent("chat_message", {
+      this.memory.createChatEvent({
         username,
         message,
       });
@@ -265,14 +285,3 @@ export class Bot {
     return this.agent;
   }
 }
-
-
-
-
-
-
-
-
-
-
-

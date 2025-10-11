@@ -65,10 +65,10 @@ cd bot
 chmod +x deploy-bots.py
 
 # Start all bots from config
-./deploy-bots.py
+python ./deploy-bots.py
 
 # Stop all bots
-./deploy-bots.py stop
+python ./deploy-bots.py stop
 ```
 
 ### Production Mode

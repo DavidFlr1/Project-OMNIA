@@ -71,17 +71,16 @@ export class InteractionManager {
       // For regular chat, check if player is nearby and looking at the bot
       if (isNearby && isLooking) {
         // Store interaction in memory
-        this.memory.createEvent("chat_message", {
+        this.memory.createChatEvent({
           username,
           message,
           distance,
           isNearby,
           isLooking,
         });
-        
+
         await this.respondToPlayer(username, message);
         this.startLookingAtPlayer(username);
-
       }
     }
   }
@@ -106,8 +105,7 @@ export class InteractionManager {
       logger.info(`Responded to ${username}: "${response}"`);
 
       // Store response in memory
-      this.memory.createEvent("chat_message", {
-        event: "bot_response",
+      this.memory.createChatEvent({
         username,
         message,
         response,

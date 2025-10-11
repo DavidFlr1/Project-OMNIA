@@ -27,17 +27,17 @@ export type Data<T extends EventType = EventType> = T extends "chat_message"
   : T extends "command_executed"
   ? {
       command: string;
-      status?: 'in_progress' | 'info' | 'completed' | 'interrupted' | 'invalid' | 'failed';
+      status?: "in_progress" | "info" | "completed" | "interrupted" | "invalid" | "failed";
       message?: string;
       metadata?: any;
     }
   : T extends "discovery_made"
   ? {
       event: string;
-      blocks?: Discovery[]
-      entities?: Discovery[]
-      structures?: Discovery[]
-      goals?: Discovery[]
+      blocks?: Discovery[];
+      entities?: Discovery[];
+      structures?: Discovery[];
+      goals?: Discovery[];
       data?: any;
       metadata?: any;
     }
@@ -132,6 +132,43 @@ export class Memory {
       return result.event_id;
     } catch (error) {
       logger.error(`Failed to create event via storage service: ${error}`);
+      return null;
+    }
+  }
+
+  // Chat-specific memory management
+  async createChatEvent(chatData: Data<"chat_message">, severity: number = 1): Promise<string | null> {
+    try {
+      const botId = this.agentMemory.data.username || this.agentMemory.data.subPort || "unknown";
+
+      const response = await fetch(`${process.env.STORAGE_SERVICE_URL}/chat/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: chatData.username,
+          message: chatData.message,
+          response: chatData.response,
+          distance: chatData.distance,
+          isNearby: chatData.isNearby,
+          isLooking: chatData.isLooking,
+          botId: botId,
+          severity: severity,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result: any = await response.json();
+      logger.info(
+        `Chat message created via storage service: ${chatData.username} -> "${chatData.message}" (${result.chat_id})`
+      );
+      return result.chat_id;
+    } catch (error) {
+      logger.error(`Failed to create chat message via storage service: ${error}`);
       return null;
     }
   }
