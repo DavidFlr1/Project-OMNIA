@@ -10,9 +10,15 @@ services:
     restart: unless-stopped
     environment:
       - MEMORY=6G
+    logging:
+      driver: "gcplogs"
+      options:
+        gcp-project: "omnia-dev-470001"
+        gcp-log-cmd: "true"
     networks:
       - omnia-network
 
 networks:
   omnia-network:
     driver: bridge
+

@@ -11,6 +11,8 @@
   "resourceLimits": {
     "maxMemoryMB": 1024,
     "maxCpuPercent": 80,
+    "maxBotMemoryMB": 512,
+    "maxBotCpuPercent": 60,
     "alertThreshold": 800,
     "maxInstances": 4,
     "maxBotsPerInstance": 5

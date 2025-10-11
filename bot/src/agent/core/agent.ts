@@ -13,6 +13,7 @@ export interface AgentState {
   status?: AgentStatus;
   username?: string;
   subPort?: number;
+  password?: string;
   health?: number;
   food?: number;
   position?: { x: number; y: number; z: number };
@@ -28,6 +29,16 @@ export interface AgentState {
   stats?: any; // Interactions stats
 
   timestamp?: number;
+
+  deployment?: {
+    project: string;
+    instanceId: string;
+    behavior: 'overwrite' | 'append' | 'bot' | 'destroy';
+  }
+  meta?: {
+    version: string;
+    lastUpdated: string;
+  }
 }
 
 export class Agent {

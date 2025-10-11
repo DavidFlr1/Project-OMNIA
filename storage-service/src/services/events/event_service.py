@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from uuid import uuid4
+from .store_handler import StoreHandler
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class EventService:
     
     def __init__(self, db_connections):
         self.db = db_connections
+        self.store_handler = StoreHandler(db_connections)
         
     async def createEvent(self, event_type: str, data: Dict[str, Any], 
                          botId: Optional[str] = None, severity: int = 0) -> str:

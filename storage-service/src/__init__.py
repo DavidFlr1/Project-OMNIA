@@ -30,6 +30,7 @@ class DatabaseConnections:
         await self._init_redis()
         # await self._init_firestore()
         # await self._init_cloud_storage()
+        # await self._init_bucket()
         
     async def _init_redis(self):
         """Initialize Redis connection for hot storage"""

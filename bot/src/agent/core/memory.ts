@@ -184,6 +184,7 @@ export class Memory {
   updateAgentState(state: AgentState): void {
     // Store in memory and redis
     this.agentMemory = { id: "agent", type: "agent", data: state, timestamp: Date.now() };
+    this.createEvent("bot_log", { event: "bot_status", data: state });
   }
 
   //! DEPRECATED START
